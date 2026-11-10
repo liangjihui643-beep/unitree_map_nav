@@ -57,13 +57,13 @@
         update_frequency: 5.0
         inflation_layer: {inflation_radius: 0.30, cost_scaling_factor: 5.0}
       DWAPlannerROS:
-        max_vel_x: 0.18
+        max_vel_x: 0.15
         min_vel_x: -0.05
-        max_vel_trans: 0.18
+        max_vel_trans: 0.15
         acc_lim_x: 0.4
         acc_lim_theta: 1.0
-        max_vel_rot: 0.8
-        min_vel_rot: -0.8
+        max_vel_rot: 0.6
+        min_vel_rot: -0.6
         sim_time: 2.0
         xy_goal_tolerance: 0.20
         path_distance_bias: 32.0

@@ -5032,10 +5032,10 @@
       <static>true</static>
       <link name="structure">
         <collision name="rock_00_collision">
-          <pose>6.7544395 1.445329 0.031001173 0 0 2.8028648</pose>
+          <pose>6.7544395 1.445329 0.021875733 0 0 2.8028648</pose>
           <geometry>
             <box>
-              <size>0.21574126 0.18120394 0.062002345</size>
+              <size>0.21574126 0.18120394 0.043751466</size>
             </box>
           </geometry>
           <surface>
@@ -5048,10 +5048,10 @@
           </surface>
         </collision>
         <visual name="rock_00_visual">
-          <pose>6.7544395 1.445329 0.031001173 0 0 2.8028648</pose>
+          <pose>6.7544395 1.445329 0.021875733 0 0 2.8028648</pose>
           <geometry>
             <box>
-              <size>0.21574126 0.18120394 0.062002345</size>
+              <size>0.21574126 0.18120394 0.043751466</size>
             </box>
           </geometry>
           <material>
@@ -5060,10 +5060,10 @@
           </material>
         </visual>
         <collision name="rock_01_collision">
-          <pose>7.0497635 1.6518465 0.021191889 0 0 0.6246669</pose>
+          <pose>7.0497635 1.6518465 0.01574493 0 0 0.6246669</pose>
           <geometry>
             <box>
-              <size>0.18569619 0.10318432 0.042383778</size>
+              <size>0.18569619 0.10318432 0.031489861</size>
             </box>
           </geometry>
           <surface>
@@ -5076,10 +5076,10 @@
           </surface>
         </collision>
         <visual name="rock_01_visual">
-          <pose>7.0497635 1.6518465 0.021191889 0 0 0.6246669</pose>
+          <pose>7.0497635 1.6518465 0.01574493 0 0 0.6246669</pose>
           <geometry>
             <box>
-              <size>0.18569619 0.10318432 0.042383778</size>
+              <size>0.18569619 0.10318432 0.031489861</size>
             </box>
           </geometry>
           <material>
@@ -5088,10 +5088,10 @@
           </material>
         </visual>
         <collision name="rock_02_collision">
-          <pose>6.6045481 1.2313939 0.028817625 0 0 2.5315558</pose>
+          <pose>6.6045481 1.2313939 0.020511016 0 0 2.5315558</pose>
           <geometry>
             <box>
-              <size>0.22522596 0.10077985 0.05763525</size>
+              <size>0.22522596 0.10077985 0.041022031</size>
             </box>
           </geometry>
           <surface>
@@ -5104,10 +5104,10 @@
           </surface>
         </collision>
         <visual name="rock_02_visual">
-          <pose>6.6045481 1.2313939 0.028817625 0 0 2.5315558</pose>
+          <pose>6.6045481 1.2313939 0.020511016 0 0 2.5315558</pose>
           <geometry>
             <box>
-              <size>0.22522596 0.10077985 0.05763525</size>
+              <size>0.22522596 0.10077985 0.041022031</size>
             </box>
           </geometry>
           <material>
@@ -5116,10 +5116,10 @@
           </material>
         </visual>
         <collision name="rock_03_collision">
-          <pose>6.7159734 1.251323 0.02621918 0 0 0.30384346</pose>
+          <pose>6.7159734 1.251323 0.018886987 0 0 0.30384346</pose>
           <geometry>
             <box>
-              <size>0.16375729 0.1111295 0.05243836</size>
+              <size>0.16375729 0.1111295 0.037773975</size>
             </box>
           </geometry>
           <surface>
@@ -5132,10 +5132,10 @@
           </surface>
         </collision>
         <visual name="rock_03_visual">
-          <pose>6.7159734 1.251323 0.02621918 0 0 0.30384346</pose>
+          <pose>6.7159734 1.251323 0.018886987 0 0 0.30384346</pose>
           <geometry>
             <box>
-              <size>0.16375729 0.1111295 0.05243836</size>
+              <size>0.16375729 0.1111295 0.037773975</size>
             </box>
           </geometry>
           <material>
@@ -5144,10 +5144,10 @@
           </material>
         </visual>
         <collision name="rock_04_collision">
-          <pose>7.00104 1.2139275 0.052285131 0 0 1.1892008</pose>
+          <pose>7.00104 1.2139275 0.035178207 0 0 1.1892008</pose>
           <geometry>
             <box>
-              <size>0.18970965 0.21677389 0.10457026</size>
+              <size>0.18970965 0.21677389 0.070356414</size>
             </box>
           </geometry>
           <surface>
@@ -5160,10 +5160,10 @@
           </surface>
         </collision>
         <visual name="rock_04_visual">
-          <pose>7.00104 1.2139275 0.052285131 0 0 1.1892008</pose>
+          <pose>7.00104 1.2139275 0.035178207 0 0 1.1892008</pose>
           <geometry>
             <box>
-              <size>0.18970965 0.21677389 0.10457026</size>
+              <size>0.18970965 0.21677389 0.070356414</size>
             </box>
           </geometry>
           <material>
@@ -5172,10 +5172,10 @@
           </material>
         </visual>
         <collision name="rock_05_collision">
-          <pose>6.4118914 1.368371 0.04474079 0 0 0.14396155</pose>
+          <pose>6.4118914 1.368371 0.030462994 0 0 0.14396155</pose>
           <geometry>
             <box>
-              <size>0.19505578 0.18454862 0.08948158</size>
+              <size>0.19505578 0.18454862 0.060925988</size>
             </box>
           </geometry>
           <surface>
@@ -5188,10 +5188,10 @@
           </surface>
         </collision>
         <visual name="rock_05_visual">
-          <pose>6.4118914 1.368371 0.04474079 0 0 0.14396155</pose>
+          <pose>6.4118914 1.368371 0.030462994 0 0 0.14396155</pose>
           <geometry>
             <box>
-              <size>0.19505578 0.18454862 0.08948158</size>
+              <size>0.19505578 0.18454862 0.060925988</size>
             </box>
           </geometry>
           <material>
@@ -5200,10 +5200,10 @@
           </material>
         </visual>
         <collision name="rock_06_collision">
-          <pose>6.833509 1.7397461 0.023191679 0 0 1.9970616</pose>
+          <pose>6.833509 1.7397461 0.016994799 0 0 1.9970616</pose>
           <geometry>
             <box>
-              <size>0.13313019 0.13335683 0.046383358</size>
+              <size>0.13313019 0.13335683 0.033989599</size>
             </box>
           </geometry>
           <surface>
@@ -5216,10 +5216,10 @@
           </surface>
         </collision>
         <visual name="rock_06_visual">
-          <pose>6.833509 1.7397461 0.023191679 0 0 1.9970616</pose>
+          <pose>6.833509 1.7397461 0.016994799 0 0 1.9970616</pose>
           <geometry>
             <box>
-              <size>0.13313019 0.13335683 0.046383358</size>
+              <size>0.13313019 0.13335683 0.033989599</size>
             </box>
           </geometry>
           <material>
@@ -5228,10 +5228,10 @@
           </material>
         </visual>
         <collision name="rock_07_collision">
-          <pose>6.6191553 1.7055646 0.028380281 0 0 1.9136415</pose>
+          <pose>6.6191553 1.7055646 0.020237676 0 0 1.9136415</pose>
           <geometry>
             <box>
-              <size>0.2417651 0.17776425 0.056760562</size>
+              <size>0.2417651 0.17776425 0.040475352</size>
             </box>
           </geometry>
           <surface>
@@ -5244,10 +5244,10 @@
           </surface>
         </collision>
         <visual name="rock_07_visual">
-          <pose>6.6191553 1.7055646 0.028380281 0 0 1.9136415</pose>
+          <pose>6.6191553 1.7055646 0.020237676 0 0 1.9136415</pose>
           <geometry>
             <box>
-              <size>0.2417651 0.17776425 0.056760562</size>
+              <size>0.2417651 0.17776425 0.040475352</size>
             </box>
           </geometry>
           <material>
@@ -5256,10 +5256,10 @@
           </material>
         </visual>
         <collision name="rock_08_collision">
-          <pose>6.9827002 1.8380367 0.0265361 0 0 1.7497092</pose>
+          <pose>6.9827002 1.8380367 0.019085062 0 0 1.7497092</pose>
           <geometry>
             <box>
-              <size>0.24863804 0.17679997 0.0530722</size>
+              <size>0.24863804 0.17679997 0.038170125</size>
             </box>
           </geometry>
           <surface>
@@ -5272,10 +5272,10 @@
           </surface>
         </collision>
         <visual name="rock_08_visual">
-          <pose>6.9827002 1.8380367 0.0265361 0 0 1.7497092</pose>
+          <pose>6.9827002 1.8380367 0.019085062 0 0 1.7497092</pose>
           <geometry>
             <box>
-              <size>0.24863804 0.17679997 0.0530722</size>
+              <size>0.24863804 0.17679997 0.038170125</size>
             </box>
           </geometry>
           <material>
@@ -5284,10 +5284,10 @@
           </material>
         </visual>
         <collision name="rock_09_collision">
-          <pose>6.6350073 1.1212456 0.051039996 0 0 0.84113277</pose>
+          <pose>6.6350073 1.1212456 0.034399998 0 0 0.84113277</pose>
           <geometry>
             <box>
-              <size>0.12417303 0.13785437 0.10207999</size>
+              <size>0.12417303 0.13785437 0.068799996</size>
             </box>
           </geometry>
           <surface>
@@ -5300,10 +5300,10 @@
           </surface>
         </collision>
         <visual name="rock_09_visual">
-          <pose>6.6350073 1.1212456 0.051039996 0 0 0.84113277</pose>
+          <pose>6.6350073 1.1212456 0.034399998 0 0 0.84113277</pose>
           <geometry>
             <box>
-              <size>0.12417303 0.13785437 0.10207999</size>
+              <size>0.12417303 0.13785437 0.068799996</size>
             </box>
           </geometry>
           <material>
@@ -5312,10 +5312,10 @@
           </material>
         </visual>
         <collision name="rock_10_collision">
-          <pose>6.9060533 1.9239008 0.055054705 0 0 2.873136</pose>
+          <pose>6.9060533 1.9239008 0.036909191 0 0 2.873136</pose>
           <geometry>
             <box>
-              <size>0.20520703 0.14747583 0.11010941</size>
+              <size>0.20520703 0.14747583 0.073818381</size>
             </box>
           </geometry>
           <surface>
@@ -5328,10 +5328,10 @@
           </surface>
         </collision>
         <visual name="rock_10_visual">
-          <pose>6.9060533 1.9239008 0.055054705 0 0 2.873136</pose>
+          <pose>6.9060533 1.9239008 0.036909191 0 0 2.873136</pose>
           <geometry>
             <box>
-              <size>0.20520703 0.14747583 0.11010941</size>
+              <size>0.20520703 0.14747583 0.073818381</size>
             </box>
           </geometry>
           <material>
@@ -5340,10 +5340,10 @@
           </material>
         </visual>
         <collision name="rock_11_collision">
-          <pose>6.5760982 1.5592132 0.0298651 0 0 2.8205938</pose>
+          <pose>6.5760982 1.5592132 0.021165688 0 0 2.8205938</pose>
           <geometry>
             <box>
-              <size>0.15415641 0.17015032 0.059730201</size>
+              <size>0.15415641 0.17015032 0.042331375</size>
             </box>
           </geometry>
           <surface>
@@ -5356,10 +5356,10 @@
           </surface>
         </collision>
         <visual name="rock_11_visual">
-          <pose>6.5760982 1.5592132 0.0298651 0 0 2.8205938</pose>
+          <pose>6.5760982 1.5592132 0.021165688 0 0 2.8205938</pose>
           <geometry>
             <box>
-              <size>0.15415641 0.17015032 0.059730201</size>
+              <size>0.15415641 0.17015032 0.042331375</size>
             </box>
           </geometry>
           <material>
@@ -5373,10 +5373,10 @@
       <static>true</static>
       <link name="structure">
         <collision name="rock_00_collision">
-          <pose>7.7299734 2.3245127 0.059901504 0 0 0.3444729</pose>
+          <pose>7.7299734 2.3245127 0.03993844 0 0 0.3444729</pose>
           <geometry>
             <box>
-              <size>0.13181822 0.10565397 0.11980301</size>
+              <size>0.13181822 0.10565397 0.07987688</size>
             </box>
           </geometry>
           <surface>
@@ -5389,10 +5389,10 @@
           </surface>
         </collision>
         <visual name="rock_00_visual">
-          <pose>7.7299734 2.3245127 0.059901504 0 0 0.3444729</pose>
+          <pose>7.7299734 2.3245127 0.03993844 0 0 0.3444729</pose>
           <geometry>
             <box>
-              <size>0.13181822 0.10565397 0.11980301</size>
+              <size>0.13181822 0.10565397 0.07987688</size>
             </box>
           </geometry>
           <material>
@@ -5401,10 +5401,10 @@
           </material>
         </visual>
         <collision name="rock_01_collision">
-          <pose>7.6211931 1.9124887 0.036886399 0 0 1.6622617</pose>
+          <pose>7.6211931 1.9124887 0.025553999 0 0 1.6622617</pose>
           <geometry>
             <box>
-              <size>0.16961051 0.21953457 0.073772797</size>
+              <size>0.16961051 0.21953457 0.051107998</size>
             </box>
           </geometry>
           <surface>
@@ -5417,10 +5417,10 @@
           </surface>
         </collision>
         <visual name="rock_01_visual">
-          <pose>7.6211931 1.9124887 0.036886399 0 0 1.6622617</pose>
+          <pose>7.6211931 1.9124887 0.025553999 0 0 1.6622617</pose>
           <geometry>
             <box>
-              <size>0.16961051 0.21953457 0.073772797</size>
+              <size>0.16961051 0.21953457 0.051107998</size>
             </box>
           </geometry>
           <material>
@@ -5429,10 +5429,10 @@
           </material>
         </visual>
         <collision name="rock_02_collision">
-          <pose>8.3106275 2.1245484 0.020459241 0 0 0.83825606</pose>
+          <pose>8.3106275 2.1245484 0.015287026 0 0 0.83825606</pose>
           <geometry>
             <box>
-              <size>0.20862235 0.16443644 0.040918482</size>
+              <size>0.20862235 0.16443644 0.030574051</size>
             </box>
           </geometry>
           <surface>
@@ -5445,10 +5445,10 @@
           </surface>
         </collision>
         <visual name="rock_02_visual">
-          <pose>8.3106275 2.1245484 0.020459241 0 0 0.83825606</pose>
+          <pose>8.3106275 2.1245484 0.015287026 0 0 0.83825606</pose>
           <geometry>
             <box>
-              <size>0.20862235 0.16443644 0.040918482</size>
+              <size>0.20862235 0.16443644 0.030574051</size>
             </box>
           </geometry>
           <material>
@@ -5457,10 +5457,10 @@
           </material>
         </visual>
         <collision name="rock_03_collision">
-          <pose>7.8048984 2.083617 0.03739061 0 0 0.82746111</pose>
+          <pose>7.8048984 2.083617 0.025869131 0 0 0.82746111</pose>
           <geometry>
             <box>
-              <size>0.24399607 0.20510235 0.07478122</size>
+              <size>0.24399607 0.20510235 0.051738263</size>
             </box>
           </geometry>
           <surface>
@@ -5473,10 +5473,10 @@
           </surface>
         </collision>
         <visual name="rock_03_visual">
-          <pose>7.8048984 2.083617 0.03739061 0 0 0.82746111</pose>
+          <pose>7.8048984 2.083617 0.025869131 0 0 0.82746111</pose>
           <geometry>
             <box>
-              <size>0.24399607 0.20510235 0.07478122</size>
+              <size>0.24399607 0.20510235 0.051738263</size>
             </box>
           </geometry>
           <material>
@@ -5485,10 +5485,10 @@
           </material>
         </visual>
         <collision name="rock_04_collision">
-          <pose>7.7097988 2.1992996 0.056505114 0 0 1.9131363</pose>
+          <pose>7.7097988 2.1992996 0.037815696 0 0 1.9131363</pose>
           <geometry>
             <box>
-              <size>0.15879782 0.17667394 0.11301023</size>
+              <size>0.15879782 0.17667394 0.075631392</size>
             </box>
           </geometry>
           <surface>
@@ -5501,10 +5501,10 @@
           </surface>
         </collision>
         <visual name="rock_04_visual">
-          <pose>7.7097988 2.1992996 0.056505114 0 0 1.9131363</pose>
+          <pose>7.7097988 2.1992996 0.037815696 0 0 1.9131363</pose>
           <geometry>
             <box>
-              <size>0.15879782 0.17667394 0.11301023</size>
+              <size>0.15879782 0.17667394 0.075631392</size>
             </box>
           </geometry>
           <material>
@@ -5513,10 +5513,10 @@
           </material>
         </visual>
         <collision name="rock_05_collision">
-          <pose>8.1252616 2.5219715 0.041575161 0 0 1.0183663</pose>
+          <pose>8.1252616 2.5219715 0.028484476 0 0 1.0183663</pose>
           <geometry>
             <box>
-              <size>0.18894598 0.10006863 0.083150322</size>
+              <size>0.18894598 0.10006863 0.056968952</size>
             </box>
           </geometry>
           <surface>
@@ -5529,10 +5529,10 @@
           </surface>
         </collision>
         <visual name="rock_05_visual">
-          <pose>8.1252616 2.5219715 0.041575161 0 0 1.0183663</pose>
+          <pose>8.1252616 2.5219715 0.028484476 0 0 1.0183663</pose>
           <geometry>
             <box>
-              <size>0.18894598 0.10006863 0.083150322</size>
+              <size>0.18894598 0.10006863 0.056968952</size>
             </box>
           </geometry>
           <material>
@@ -5541,10 +5541,10 @@
           </material>
         </visual>
         <collision name="rock_06_collision">
-          <pose>8.3305101 2.2529487 0.055148875 0 0 2.7583485</pose>
+          <pose>8.3305101 2.2529487 0.036968047 0 0 2.7583485</pose>
           <geometry>
             <box>
-              <size>0.15997684 0.10695102 0.11029775</size>
+              <size>0.15997684 0.10695102 0.073936094</size>
             </box>
           </geometry>
           <surface>
@@ -5557,10 +5557,10 @@
           </surface>
         </collision>
         <visual name="rock_06_visual">
-          <pose>8.3305101 2.2529487 0.055148875 0 0 2.7583485</pose>
+          <pose>8.3305101 2.2529487 0.036968047 0 0 2.7583485</pose>
           <geometry>
             <box>
-              <size>0.15997684 0.10695102 0.11029775</size>
+              <size>0.15997684 0.10695102 0.073936094</size>
             </box>
           </geometry>
           <material>
@@ -5569,10 +5569,10 @@
           </material>
         </visual>
         <collision name="rock_07_collision">
-          <pose>8.0244509 2.1569094 0.039439619 0 0 0.40335368</pose>
+          <pose>8.0244509 2.1569094 0.027149762 0 0 0.40335368</pose>
           <geometry>
             <box>
-              <size>0.21887828 0.19190013 0.078879237</size>
+              <size>0.21887828 0.19190013 0.054299523</size>
             </box>
           </geometry>
           <surface>
@@ -5585,10 +5585,10 @@
           </surface>
         </collision>
         <visual name="rock_07_visual">
-          <pose>8.0244509 2.1569094 0.039439619 0 0 0.40335368</pose>
+          <pose>8.0244509 2.1569094 0.027149762 0 0 0.40335368</pose>
           <geometry>
             <box>
-              <size>0.21887828 0.19190013 0.078879237</size>
+              <size>0.21887828 0.19190013 0.054299523</size>
             </box>
           </geometry>
           <material>
@@ -5597,10 +5597,10 @@
           </material>
         </visual>
         <collision name="rock_08_collision">
-          <pose>7.5703466 2.2516126 0.030602265 0 0 1.6942486</pose>
+          <pose>7.5703466 2.2516126 0.021626416 0 0 1.6942486</pose>
           <geometry>
             <box>
-              <size>0.17500793 0.12541578 0.06120453</size>
+              <size>0.17500793 0.12541578 0.043252831</size>
             </box>
           </geometry>
           <surface>
@@ -5613,10 +5613,10 @@
           </surface>
         </collision>
         <visual name="rock_08_visual">
-          <pose>7.5703466 2.2516126 0.030602265 0 0 1.6942486</pose>
+          <pose>7.5703466 2.2516126 0.021626416 0 0 1.6942486</pose>
           <geometry>
             <box>
-              <size>0.17500793 0.12541578 0.06120453</size>
+              <size>0.17500793 0.12541578 0.043252831</size>
             </box>
           </geometry>
           <material>
@@ -5625,10 +5625,10 @@
           </material>
         </visual>
         <collision name="rock_09_collision">
-          <pose>7.874618 1.999778 0.032468652 0 0 1.6260125</pose>
+          <pose>7.874618 1.999778 0.022792907 0 0 1.6260125</pose>
           <geometry>
             <box>
-              <size>0.20448415 0.15257201 0.064937303</size>
+              <size>0.20448415 0.15257201 0.045585815</size>
             </box>
           </geometry>
           <surface>
@@ -5641,10 +5641,10 @@
           </surface>
         </collision>
         <visual name="rock_09_visual">
-          <pose>7.874618 1.999778 0.032468652 0 0 1.6260125</pose>
+          <pose>7.874618 1.999778 0.022792907 0 0 1.6260125</pose>
           <geometry>
             <box>
-              <size>0.20448415 0.15257201 0.064937303</size>
+              <size>0.20448415 0.15257201 0.045585815</size>
             </box>
           </geometry>
           <material>
@@ -5653,10 +5653,10 @@
           </material>
         </visual>
         <collision name="rock_10_collision">
-          <pose>8.054572 2.346999 0.033523422 0 0 0.22303136</pose>
+          <pose>8.054572 2.346999 0.023452139 0 0 0.22303136</pose>
           <geometry>
             <box>
-              <size>0.14991492 0.12642609 0.067046845</size>
+              <size>0.14991492 0.12642609 0.046904278</size>
             </box>
           </geometry>
           <surface>
@@ -5669,10 +5669,10 @@
           </surface>
         </collision>
         <visual name="rock_10_visual">
-          <pose>8.054572 2.346999 0.033523422 0 0 0.22303136</pose>
+          <pose>8.054572 2.346999 0.023452139 0 0 0.22303136</pose>
           <geometry>
             <box>
-              <size>0.14991492 0.12642609 0.067046845</size>
+              <size>0.14991492 0.12642609 0.046904278</size>
             </box>
           </geometry>
           <material>
@@ -5681,10 +5681,10 @@
           </material>
         </visual>
         <collision name="rock_11_collision">
-          <pose>7.7536977 2.0420242 0.056216801 0 0 2.1016557</pose>
+          <pose>7.7536977 2.0420242 0.0376355 0 0 2.1016557</pose>
           <geometry>
             <box>
-              <size>0.12921146 0.12856056 0.1124336</size>
+              <size>0.12921146 0.12856056 0.075271001</size>
             </box>
           </geometry>
           <surface>
@@ -5697,10 +5697,10 @@
           </surface>
         </collision>
         <visual name="rock_11_visual">
-          <pose>7.7536977 2.0420242 0.056216801 0 0 2.1016557</pose>
+          <pose>7.7536977 2.0420242 0.0376355 0 0 2.1016557</pose>
           <geometry>
             <box>
-              <size>0.12921146 0.12856056 0.1124336</size>
+              <size>0.12921146 0.12856056 0.075271001</size>
             </box>
           </geometry>
           <material>
@@ -5714,10 +5714,10 @@
       <static>true</static>
       <link name="structure">
         <collision name="rock_00_collision">
-          <pose>6.6364726 3.459571 0.05742057 0 0 2.5368266</pose>
+          <pose>6.6364726 3.459571 0.038387856 0 0 2.5368266</pose>
           <geometry>
             <box>
-              <size>0.18144723 0.19415433 0.11484114</size>
+              <size>0.18144723 0.19415433 0.076775712</size>
             </box>
           </geometry>
           <surface>
@@ -5730,10 +5730,10 @@
           </surface>
         </collision>
         <visual name="rock_00_visual">
-          <pose>6.6364726 3.459571 0.05742057 0 0 2.5368266</pose>
+          <pose>6.6364726 3.459571 0.038387856 0 0 2.5368266</pose>
           <geometry>
             <box>
-              <size>0.18144723 0.19415433 0.11484114</size>
+              <size>0.18144723 0.19415433 0.076775712</size>
             </box>
           </geometry>
           <material>
@@ -5742,10 +5742,10 @@
           </material>
         </visual>
         <collision name="rock_01_collision">
-          <pose>6.6512392 3.4303957 0.037242047 0 0 2.1154371</pose>
+          <pose>6.6512392 3.4303957 0.02577628 0 0 2.1154371</pose>
           <geometry>
             <box>
-              <size>0.18071321 0.1874891 0.074484095</size>
+              <size>0.18071321 0.1874891 0.051552559</size>
             </box>
           </geometry>
           <surface>
@@ -5758,10 +5758,10 @@
           </surface>
         </collision>
         <visual name="rock_01_visual">
-          <pose>6.6512392 3.4303957 0.037242047 0 0 2.1154371</pose>
+          <pose>6.6512392 3.4303957 0.02577628 0 0 2.1154371</pose>
           <geometry>
             <box>
-              <size>0.18071321 0.1874891 0.074484095</size>
+              <size>0.18071321 0.1874891 0.051552559</size>
             </box>
           </geometry>
           <material>
@@ -5770,10 +5770,10 @@
           </material>
         </visual>
         <collision name="rock_02_collision">
-          <pose>6.7404742 3.2859775 0.036104851 0 0 0.59755891</pose>
+          <pose>6.7404742 3.2859775 0.025065532 0 0 0.59755891</pose>
           <geometry>
             <box>
-              <size>0.23201743 0.12983876 0.072209703</size>
+              <size>0.23201743 0.12983876 0.050131064</size>
             </box>
           </geometry>
           <surface>
@@ -5786,10 +5786,10 @@
           </surface>
         </collision>
         <visual name="rock_02_visual">
-          <pose>6.7404742 3.2859775 0.036104851 0 0 0.59755891</pose>
+          <pose>6.7404742 3.2859775 0.025065532 0 0 0.59755891</pose>
           <geometry>
             <box>
-              <size>0.23201743 0.12983876 0.072209703</size>
+              <size>0.23201743 0.12983876 0.050131064</size>
             </box>
           </geometry>
           <material>
@@ -5798,10 +5798,10 @@
           </material>
         </visual>
         <collision name="rock_03_collision">
-          <pose>6.322817 3.3927394 0.031141806 0 0 2.706008</pose>
+          <pose>6.322817 3.3927394 0.021963629 0 0 2.706008</pose>
           <geometry>
             <box>
-              <size>0.24002453 0.15317569 0.062283612</size>
+              <size>0.24002453 0.15317569 0.043927257</size>
             </box>
           </geometry>
           <surface>
@@ -5814,10 +5814,10 @@
           </surface>
         </collision>
         <visual name="rock_03_visual">
-          <pose>6.322817 3.3927394 0.031141806 0 0 2.706008</pose>
+          <pose>6.322817 3.3927394 0.021963629 0 0 2.706008</pose>
           <geometry>
             <box>
-              <size>0.24002453 0.15317569 0.062283612</size>
+              <size>0.24002453 0.15317569 0.043927257</size>
             </box>
           </geometry>
           <material>
@@ -5826,10 +5826,10 @@
           </material>
         </visual>
         <collision name="rock_04_collision">
-          <pose>6.5038045 3.2685267 0.059971299 0 0 2.6662563</pose>
+          <pose>6.5038045 3.2685267 0.039982062 0 0 2.6662563</pose>
           <geometry>
             <box>
-              <size>0.24596951 0.21116404 0.1199426</size>
+              <size>0.24596951 0.21116404 0.079964123</size>
             </box>
           </geometry>
           <surface>
@@ -5842,10 +5842,10 @@
           </surface>
         </collision>
         <visual name="rock_04_visual">
-          <pose>6.5038045 3.2685267 0.059971299 0 0 2.6662563</pose>
+          <pose>6.5038045 3.2685267 0.039982062 0 0 2.6662563</pose>
           <geometry>
             <box>
-              <size>0.24596951 0.21116404 0.1199426</size>
+              <size>0.24596951 0.21116404 0.079964123</size>
             </box>
           </geometry>
           <material>
@@ -5854,10 +5854,10 @@
           </material>
         </visual>
         <collision name="rock_05_collision">
-          <pose>6.7574042 3.571231 0.028549892 0 0 3.095439</pose>
+          <pose>6.7574042 3.571231 0.020343682 0 0 3.095439</pose>
           <geometry>
             <box>
-              <size>0.1276226 0.14547677 0.057099784</size>
+              <size>0.1276226 0.14547677 0.040687365</size>
             </box>
           </geometry>
           <surface>
@@ -5870,10 +5870,10 @@
           </surface>
         </collision>
         <visual name="rock_05_visual">
-          <pose>6.7574042 3.571231 0.028549892 0 0 3.095439</pose>
+          <pose>6.7574042 3.571231 0.020343682 0 0 3.095439</pose>
           <geometry>
             <box>
-              <size>0.1276226 0.14547677 0.057099784</size>
+              <size>0.1276226 0.14547677 0.040687365</size>
             </box>
           </geometry>
           <material>
@@ -5882,10 +5882,10 @@
           </material>
         </visual>
         <collision name="rock_06_collision">
-          <pose>6.561995 3.6966484 0.038200335 0 0 1.7459977</pose>
+          <pose>6.561995 3.6966484 0.026375209 0 0 1.7459977</pose>
           <geometry>
             <box>
-              <size>0.24445129 0.21945072 0.076400669</size>
+              <size>0.24445129 0.21945072 0.052750418</size>
             </box>
           </geometry>
           <surface>
@@ -5898,10 +5898,10 @@
           </surface>
         </collision>
         <visual name="rock_06_visual">
-          <pose>6.561995 3.6966484 0.038200335 0 0 1.7459977</pose>
+          <pose>6.561995 3.6966484 0.026375209 0 0 1.7459977</pose>
           <geometry>
             <box>
-              <size>0.24445129 0.21945072 0.076400669</size>
+              <size>0.24445129 0.21945072 0.052750418</size>
             </box>
           </geometry>
           <material>
@@ -5910,10 +5910,10 @@
           </material>
         </visual>
         <collision name="rock_07_collision">
-          <pose>6.5650867 3.1264275 0.031868313 0 0 2.3498345</pose>
+          <pose>6.5650867 3.1264275 0.022417696 0 0 2.3498345</pose>
           <geometry>
             <box>
-              <size>0.19529344 0.16506342 0.063736626</size>
+              <size>0.19529344 0.16506342 0.044835391</size>
             </box>
           </geometry>
           <surface>
@@ -5926,10 +5926,10 @@
           </surface>
         </collision>
         <visual name="rock_07_visual">
-          <pose>6.5650867 3.1264275 0.031868313 0 0 2.3498345</pose>
+          <pose>6.5650867 3.1264275 0.022417696 0 0 2.3498345</pose>
           <geometry>
             <box>
-              <size>0.19529344 0.16506342 0.063736626</size>
+              <size>0.19529344 0.16506342 0.044835391</size>
             </box>
           </geometry>
           <material>
@@ -5938,10 +5938,10 @@
           </material>
         </visual>
         <collision name="rock_08_collision">
-          <pose>6.9219933 3.4208978 0.040114015 0 0 0.25167759</pose>
+          <pose>6.9219933 3.4208978 0.02757126 0 0 0.25167759</pose>
           <geometry>
             <box>
-              <size>0.14046625 0.21529347 0.080228031</size>
+              <size>0.14046625 0.21529347 0.055142519</size>
             </box>
           </geometry>
           <surface>
@@ -5954,10 +5954,10 @@
           </surface>
         </collision>
         <visual name="rock_08_visual">
-          <pose>6.9219933 3.4208978 0.040114015 0 0 0.25167759</pose>
+          <pose>6.9219933 3.4208978 0.02757126 0 0 0.25167759</pose>
           <geometry>
             <box>
-              <size>0.14046625 0.21529347 0.080228031</size>
+              <size>0.14046625 0.21529347 0.055142519</size>
             </box>
           </geometry>
           <material>
@@ -5966,10 +5966,10 @@
           </material>
         </visual>
         <collision name="rock_09_collision">
-          <pose>6.7362062 3.6192843 0.047008502 0 0 0.77350833</pose>
+          <pose>6.7362062 3.6192843 0.031880314 0 0 0.77350833</pose>
           <geometry>
             <box>
-              <size>0.13558526 0.20683448 0.094017004</size>
+              <size>0.13558526 0.20683448 0.063760628</size>
             </box>
           </geometry>
           <surface>
@@ -5982,10 +5982,10 @@
           </surface>
         </collision>
         <visual name="rock_09_visual">
-          <pose>6.7362062 3.6192843 0.047008502 0 0 0.77350833</pose>
+          <pose>6.7362062 3.6192843 0.031880314 0 0 0.77350833</pose>
           <geometry>
             <box>
-              <size>0.13558526 0.20683448 0.094017004</size>
+              <size>0.13558526 0.20683448 0.063760628</size>
             </box>
           </geometry>
           <material>
@@ -5994,10 +5994,10 @@
           </material>
         </visual>
         <collision name="rock_10_collision">
-          <pose>6.3064864 3.101822 0.036768997 0 0 0.6416992</pose>
+          <pose>6.3064864 3.101822 0.025480623 0 0 0.6416992</pose>
           <geometry>
             <box>
-              <size>0.18796175 0.21216475 0.073537993</size>
+              <size>0.18796175 0.21216475 0.050961246</size>
             </box>
           </geometry>
           <surface>
@@ -6010,10 +6010,10 @@
           </surface>
         </collision>
         <visual name="rock_10_visual">
-          <pose>6.3064864 3.101822 0.036768997 0 0 0.6416992</pose>
+          <pose>6.3064864 3.101822 0.025480623 0 0 0.6416992</pose>
           <geometry>
             <box>
-              <size>0.18796175 0.21216475 0.073537993</size>
+              <size>0.18796175 0.21216475 0.050961246</size>
             </box>
           </geometry>
           <material>
@@ -6022,10 +6022,10 @@
           </material>
         </visual>
         <collision name="rock_11_collision">
-          <pose>6.5536492 3.0850918 0.035831434 0 0 2.362052</pose>
+          <pose>6.5536492 3.0850918 0.024894646 0 0 2.362052</pose>
           <geometry>
             <box>
-              <size>0.15899962 0.13794126 0.071662868</size>
+              <size>0.15899962 0.13794126 0.049789292</size>
             </box>
           </geometry>
           <surface>
@@ -6038,10 +6038,10 @@
           </surface>
         </collision>
         <visual name="rock_11_visual">
-          <pose>6.5536492 3.0850918 0.035831434 0 0 2.362052</pose>
+          <pose>6.5536492 3.0850918 0.024894646 0 0 2.362052</pose>
           <geometry>
             <box>
-              <size>0.15899962 0.13794126 0.071662868</size>
+              <size>0.15899962 0.13794126 0.049789292</size>
             </box>
           </geometry>
           <material>
@@ -6055,10 +6055,10 @@
       <static>true</static>
       <link name="structure">
         <collision name="rock_00_collision">
-          <pose>8.4735348 3.6340952 0.059938178 0 0 0.83315167</pose>
+          <pose>8.4735348 3.6340952 0.039961361 0 0 0.83315167</pose>
           <geometry>
             <box>
-              <size>0.12952389 0.12557852 0.11987636</size>
+              <size>0.12952389 0.12557852 0.079922722</size>
             </box>
           </geometry>
           <surface>
@@ -6071,10 +6071,10 @@
           </surface>
         </collision>
         <visual name="rock_00_visual">
-          <pose>8.4735348 3.6340952 0.059938178 0 0 0.83315167</pose>
+          <pose>8.4735348 3.6340952 0.039961361 0 0 0.83315167</pose>
           <geometry>
             <box>
-              <size>0.12952389 0.12557852 0.11987636</size>
+              <size>0.12952389 0.12557852 0.079922722</size>
             </box>
           </geometry>
           <material>
@@ -6083,10 +6083,10 @@
           </material>
         </visual>
         <collision name="rock_01_collision">
-          <pose>8.5857512 3.3280377 0.05517081 0 0 2.2102359</pose>
+          <pose>8.5857512 3.3280377 0.036981756 0 0 2.2102359</pose>
           <geometry>
             <box>
-              <size>0.14050709 0.20004939 0.11034162</size>
+              <size>0.14050709 0.20004939 0.073963512</size>
             </box>
           </geometry>
           <surface>
@@ -6099,10 +6099,10 @@
           </surface>
         </collision>
         <visual name="rock_01_visual">
-          <pose>8.5857512 3.3280377 0.05517081 0 0 2.2102359</pose>
+          <pose>8.5857512 3.3280377 0.036981756 0 0 2.2102359</pose>
           <geometry>
             <box>
-              <size>0.14050709 0.20004939 0.11034162</size>
+              <size>0.14050709 0.20004939 0.073963512</size>
             </box>
           </geometry>
           <material>
@@ -6111,10 +6111,10 @@
           </material>
         </visual>
         <collision name="rock_02_collision">
-          <pose>7.858513 3.2113803 0.046159053 0 0 2.0840971</pose>
+          <pose>7.858513 3.2113803 0.031349408 0 0 2.0840971</pose>
           <geometry>
             <box>
-              <size>0.22622354 0.13592545 0.092318105</size>
+              <size>0.22622354 0.13592545 0.062698816</size>
             </box>
           </geometry>
           <surface>
@@ -6127,10 +6127,10 @@
           </surface>
         </collision>
         <visual name="rock_02_visual">
-          <pose>7.858513 3.2113803 0.046159053 0 0 2.0840971</pose>
+          <pose>7.858513 3.2113803 0.031349408 0 0 2.0840971</pose>
           <geometry>
             <box>
-              <size>0.22622354 0.13592545 0.092318105</size>
+              <size>0.22622354 0.13592545 0.062698816</size>
             </box>
           </geometry>
           <material>
@@ -6139,10 +6139,10 @@
           </material>
         </visual>
         <collision name="rock_03_collision">
-          <pose>8.352914 3.4382647 0.024617147 0 0 1.9001289</pose>
+          <pose>8.352914 3.4382647 0.017885717 0 0 1.9001289</pose>
           <geometry>
             <box>
-              <size>0.19191907 0.13268179 0.049234294</size>
+              <size>0.19191907 0.13268179 0.035771434</size>
             </box>
           </geometry>
           <surface>
@@ -6155,10 +6155,10 @@
           </surface>
         </collision>
         <visual name="rock_03_visual">
-          <pose>8.352914 3.4382647 0.024617147 0 0 1.9001289</pose>
+          <pose>8.352914 3.4382647 0.017885717 0 0 1.9001289</pose>
           <geometry>
             <box>
-              <size>0.19191907 0.13268179 0.049234294</size>
+              <size>0.19191907 0.13268179 0.035771434</size>
             </box>
           </geometry>
           <material>
@@ -6167,10 +6167,10 @@
           </material>
         </visual>
         <collision name="rock_04_collision">
-          <pose>8.1589646 3.3011419 0.045369518 0 0 2.6581132</pose>
+          <pose>8.1589646 3.3011419 0.030855949 0 0 2.6581132</pose>
           <geometry>
             <box>
-              <size>0.18350914 0.20864038 0.090739037</size>
+              <size>0.18350914 0.20864038 0.061711898</size>
             </box>
           </geometry>
           <surface>
@@ -6183,10 +6183,10 @@
           </surface>
         </collision>
         <visual name="rock_04_visual">
-          <pose>8.1589646 3.3011419 0.045369518 0 0 2.6581132</pose>
+          <pose>8.1589646 3.3011419 0.030855949 0 0 2.6581132</pose>
           <geometry>
             <box>
-              <size>0.18350914 0.20864038 0.090739037</size>
+              <size>0.18350914 0.20864038 0.061711898</size>
             </box>
           </geometry>
           <material>
@@ -6195,10 +6195,10 @@
           </material>
         </visual>
         <collision name="rock_05_collision">
-          <pose>8.4449881 3.6604834 0.031067209 0 0 0.82295673</pose>
+          <pose>8.4449881 3.6604834 0.021917006 0 0 0.82295673</pose>
           <geometry>
             <box>
-              <size>0.2202455 0.17645361 0.062134418</size>
+              <size>0.2202455 0.17645361 0.043834011</size>
             </box>
           </geometry>
           <surface>
@@ -6211,10 +6211,10 @@
           </surface>
         </collision>
         <visual name="rock_05_visual">
-          <pose>8.4449881 3.6604834 0.031067209 0 0 0.82295673</pose>
+          <pose>8.4449881 3.6604834 0.021917006 0 0 0.82295673</pose>
           <geometry>
             <box>
-              <size>0.2202455 0.17645361 0.062134418</size>
+              <size>0.2202455 0.17645361 0.043834011</size>
             </box>
           </geometry>
           <material>
@@ -6223,10 +6223,10 @@
           </material>
         </visual>
         <collision name="rock_06_collision">
-          <pose>8.1815935 3.1662688 0.037107477 0 0 2.8397754</pose>
+          <pose>8.1815935 3.1662688 0.025692173 0 0 2.8397754</pose>
           <geometry>
             <box>
-              <size>0.1297817 0.20597277 0.074214954</size>
+              <size>0.1297817 0.20597277 0.051384346</size>
             </box>
           </geometry>
           <surface>
@@ -6239,10 +6239,10 @@
           </surface>
         </collision>
         <visual name="rock_06_visual">
-          <pose>8.1815935 3.1662688 0.037107477 0 0 2.8397754</pose>
+          <pose>8.1815935 3.1662688 0.025692173 0 0 2.8397754</pose>
           <geometry>
             <box>
-              <size>0.1297817 0.20597277 0.074214954</size>
+              <size>0.1297817 0.20597277 0.051384346</size>
             </box>
           </geometry>
           <material>
@@ -6251,10 +6251,10 @@
           </material>
         </visual>
         <collision name="rock_07_collision">
-          <pose>7.8056487 3.3838426 0.043300383 0 0 2.8242336</pose>
+          <pose>7.8056487 3.3838426 0.029562739 0 0 2.8242336</pose>
           <geometry>
             <box>
-              <size>0.13656792 0.136991 0.086600765</size>
+              <size>0.13656792 0.136991 0.059125478</size>
             </box>
           </geometry>
           <surface>
@@ -6267,10 +6267,10 @@
           </surface>
         </collision>
         <visual name="rock_07_visual">
-          <pose>7.8056487 3.3838426 0.043300383 0 0 2.8242336</pose>
+          <pose>7.8056487 3.3838426 0.029562739 0 0 2.8242336</pose>
           <geometry>
             <box>
-              <size>0.13656792 0.136991 0.086600765</size>
+              <size>0.13656792 0.136991 0.059125478</size>
             </box>
           </geometry>
           <material>
@@ -6279,10 +6279,10 @@
           </material>
         </visual>
         <collision name="rock_08_collision">
-          <pose>8.3192982 3.0999248 0.055956985 0 0 2.4508075</pose>
+          <pose>8.3192982 3.0999248 0.037473116 0 0 2.4508075</pose>
           <geometry>
             <box>
-              <size>0.15243887 0.11233523 0.11191397</size>
+              <size>0.15243887 0.11233523 0.074946232</size>
             </box>
           </geometry>
           <surface>
@@ -6295,10 +6295,10 @@
           </surface>
         </collision>
         <visual name="rock_08_visual">
-          <pose>8.3192982 3.0999248 0.055956985 0 0 2.4508075</pose>
+          <pose>8.3192982 3.0999248 0.037473116 0 0 2.4508075</pose>
           <geometry>
             <box>
-              <size>0.15243887 0.11233523 0.11191397</size>
+              <size>0.15243887 0.11233523 0.074946232</size>
             </box>
           </geometry>
           <material>
@@ -6307,10 +6307,10 @@
           </material>
         </visual>
         <collision name="rock_09_collision">
-          <pose>8.4141459 3.3091258 0.04482646 0 0 3.0668417</pose>
+          <pose>8.4141459 3.3091258 0.030516538 0 0 3.0668417</pose>
           <geometry>
             <box>
-              <size>0.24088453 0.20375268 0.089652921</size>
+              <size>0.24088453 0.20375268 0.061033076</size>
             </box>
           </geometry>
           <surface>
@@ -6323,10 +6323,10 @@
           </surface>
         </collision>
         <visual name="rock_09_visual">
-          <pose>8.4141459 3.3091258 0.04482646 0 0 3.0668417</pose>
+          <pose>8.4141459 3.3091258 0.030516538 0 0 3.0668417</pose>
           <geometry>
             <box>
-              <size>0.24088453 0.20375268 0.089652921</size>
+              <size>0.24088453 0.20375268 0.061033076</size>
             </box>
           </geometry>
           <material>
@@ -6335,10 +6335,10 @@
           </material>
         </visual>
         <collision name="rock_10_collision">
-          <pose>8.357427 3.1079496 0.020991454 0 0 2.520296</pose>
+          <pose>8.357427 3.1079496 0.015619659 0 0 2.520296</pose>
           <geometry>
             <box>
-              <size>0.16318411 0.21169791 0.041982909</size>
+              <size>0.16318411 0.21169791 0.031239318</size>
             </box>
           </geometry>
           <surface>
@@ -6351,10 +6351,10 @@
           </surface>
         </collision>
         <visual name="rock_10_visual">
-          <pose>8.357427 3.1079496 0.020991454 0 0 2.520296</pose>
+          <pose>8.357427 3.1079496 0.015619659 0 0 2.520296</pose>
           <geometry>
             <box>
-              <size>0.16318411 0.21169791 0.041982909</size>
+              <size>0.16318411 0.21169791 0.031239318</size>
             </box>
           </geometry>
           <material>
@@ -6363,10 +6363,10 @@
           </material>
         </visual>
         <collision name="rock_11_collision">
-          <pose>8.4661631 3.194494 0.030672228 0 0 2.6973503</pose>
+          <pose>8.4661631 3.194494 0.021670143 0 0 2.6973503</pose>
           <geometry>
             <box>
-              <size>0.13405243 0.20466001 0.061344457</size>
+              <size>0.13405243 0.20466001 0.043340285</size>
             </box>
           </geometry>
           <surface>
@@ -6379,10 +6379,10 @@
           </surface>
         </collision>
         <visual name="rock_11_visual">
-          <pose>8.4661631 3.194494 0.030672228 0 0 2.6973503</pose>
+          <pose>8.4661631 3.194494 0.021670143 0 0 2.6973503</pose>
           <geometry>
             <box>
-              <size>0.13405243 0.20466001 0.061344457</size>
+              <size>0.13405243 0.20466001 0.043340285</size>
             </box>
           </geometry>
           <material>
@@ -6396,10 +6396,10 @@
       <static>true</static>
       <link name="structure">
         <collision name="rock_00_collision">
-          <pose>7.4700806 1.400559 0.038412129 0 0 0.074344014</pose>
+          <pose>7.4700806 1.400559 0.026507581 0 0 0.074344014</pose>
           <geometry>
             <box>
-              <size>0.22339491 0.12731146 0.076824259</size>
+              <size>0.22339491 0.12731146 0.053015162</size>
             </box>
           </geometry>
           <surface>
@@ -6412,10 +6412,10 @@
           </surface>
         </collision>
         <visual name="rock_00_visual">
-          <pose>7.4700806 1.400559 0.038412129 0 0 0.074344014</pose>
+          <pose>7.4700806 1.400559 0.026507581 0 0 0.074344014</pose>
           <geometry>
             <box>
-              <size>0.22339491 0.12731146 0.076824259</size>
+              <size>0.22339491 0.12731146 0.053015162</size>
             </box>
           </geometry>
           <material>
@@ -6424,10 +6424,10 @@
           </material>
         </visual>
         <collision name="rock_01_collision">
-          <pose>7.4901791 1.2415383 0.054574118 0 0 1.2556267</pose>
+          <pose>7.4901791 1.2415383 0.036608824 0 0 1.2556267</pose>
           <geometry>
             <box>
-              <size>0.15628625 0.17697781 0.10914824</size>
+              <size>0.15628625 0.17697781 0.073217647</size>
             </box>
           </geometry>
           <surface>
@@ -6440,10 +6440,10 @@
           </surface>
         </collision>
         <visual name="rock_01_visual">
-          <pose>7.4901791 1.2415383 0.054574118 0 0 1.2556267</pose>
+          <pose>7.4901791 1.2415383 0.036608824 0 0 1.2556267</pose>
           <geometry>
             <box>
-              <size>0.15628625 0.17697781 0.10914824</size>
+              <size>0.15628625 0.17697781 0.073217647</size>
             </box>
           </geometry>
           <material>
@@ -6452,10 +6452,10 @@
           </material>
         </visual>
         <collision name="rock_02_collision">
-          <pose>7.7272118 0.96106279 0.057569486 0 0 3.0238907</pose>
+          <pose>7.7272118 0.96106279 0.038480929 0 0 3.0238907</pose>
           <geometry>
             <box>
-              <size>0.24615208 0.12142814 0.11513897</size>
+              <size>0.24615208 0.12142814 0.076961857</size>
             </box>
           </geometry>
           <surface>
@@ -6468,10 +6468,10 @@
           </surface>
         </collision>
         <visual name="rock_02_visual">
-          <pose>7.7272118 0.96106279 0.057569486 0 0 3.0238907</pose>
+          <pose>7.7272118 0.96106279 0.038480929 0 0 3.0238907</pose>
           <geometry>
             <box>
-              <size>0.24615208 0.12142814 0.11513897</size>
+              <size>0.24615208 0.12142814 0.076961857</size>
             </box>
           </geometry>
           <material>
@@ -6480,10 +6480,10 @@
           </material>
         </visual>
         <collision name="rock_03_collision">
-          <pose>7.3856247 1.1474614 0.03738255 0 0 1.6066829</pose>
+          <pose>7.3856247 1.1474614 0.025864094 0 0 1.6066829</pose>
           <geometry>
             <box>
-              <size>0.16077805 0.17274506 0.074765101</size>
+              <size>0.16077805 0.17274506 0.051728188</size>
             </box>
           </geometry>
           <surface>
@@ -6496,10 +6496,10 @@
           </surface>
         </collision>
         <visual name="rock_03_visual">
-          <pose>7.3856247 1.1474614 0.03738255 0 0 1.6066829</pose>
+          <pose>7.3856247 1.1474614 0.025864094 0 0 1.6066829</pose>
           <geometry>
             <box>
-              <size>0.16077805 0.17274506 0.074765101</size>
+              <size>0.16077805 0.17274506 0.051728188</size>
             </box>
           </geometry>
           <material>
@@ -6508,10 +6508,10 @@
           </material>
         </visual>
         <collision name="rock_04_collision">
-          <pose>7.1434096 1.2256555 0.0301889 0 0 1.6915968</pose>
+          <pose>7.1434096 1.2256555 0.021368063 0 0 1.6915968</pose>
           <geometry>
             <box>
-              <size>0.12021987 0.21106902 0.0603778</size>
+              <size>0.12021987 0.21106902 0.042736125</size>
             </box>
           </geometry>
           <surface>
@@ -6524,10 +6524,10 @@
           </surface>
         </collision>
         <visual name="rock_04_visual">
-          <pose>7.1434096 1.2256555 0.0301889 0 0 1.6915968</pose>
+          <pose>7.1434096 1.2256555 0.021368063 0 0 1.6915968</pose>
           <geometry>
             <box>
-              <size>0.12021987 0.21106902 0.0603778</size>
+              <size>0.12021987 0.21106902 0.042736125</size>
             </box>
           </geometry>
           <material>
@@ -6536,10 +6536,10 @@
           </material>
         </visual>
         <collision name="rock_05_collision">
-          <pose>7.3260052 0.61951392 0.04682514 0 0 1.037354</pose>
+          <pose>7.3260052 0.61951392 0.031765713 0 0 1.037354</pose>
           <geometry>
             <box>
-              <size>0.1290966 0.17970852 0.09365028</size>
+              <size>0.1290966 0.17970852 0.063531425</size>
             </box>
           </geometry>
           <surface>
@@ -6552,10 +6552,10 @@
           </surface>
         </collision>
         <visual name="rock_05_visual">
-          <pose>7.3260052 0.61951392 0.04682514 0 0 1.037354</pose>
+          <pose>7.3260052 0.61951392 0.031765713 0 0 1.037354</pose>
           <geometry>
             <box>
-              <size>0.1290966 0.17970852 0.09365028</size>
+              <size>0.1290966 0.17970852 0.063531425</size>
             </box>
           </geometry>
           <material>
@@ -6564,10 +6564,10 @@
           </material>
         </visual>
         <collision name="rock_06_collision">
-          <pose>7.2380189 1.3814252 0.048790171 0 0 1.2641781</pose>
+          <pose>7.2380189 1.3814252 0.032993857 0 0 1.2641781</pose>
           <geometry>
             <box>
-              <size>0.16020701 0.14900715 0.097580341</size>
+              <size>0.16020701 0.14900715 0.065987713</size>
             </box>
           </geometry>
           <surface>
@@ -6580,10 +6580,10 @@
           </surface>
         </collision>
         <visual name="rock_06_visual">
-          <pose>7.2380189 1.3814252 0.048790171 0 0 1.2641781</pose>
+          <pose>7.2380189 1.3814252 0.032993857 0 0 1.2641781</pose>
           <geometry>
             <box>
-              <size>0.16020701 0.14900715 0.097580341</size>
+              <size>0.16020701 0.14900715 0.065987713</size>
             </box>
           </geometry>
           <material>
@@ -6592,10 +6592,10 @@
           </material>
         </visual>
         <collision name="rock_07_collision">
-          <pose>7.3545741 1.1539879 0.036817853 0 0 1.9336971</pose>
+          <pose>7.3545741 1.1539879 0.025511158 0 0 1.9336971</pose>
           <geometry>
             <box>
-              <size>0.20805133 0.20833667 0.073635707</size>
+              <size>0.20805133 0.20833667 0.051022317</size>
             </box>
           </geometry>
           <surface>
@@ -6608,10 +6608,10 @@
           </surface>
         </collision>
         <visual name="rock_07_visual">
-          <pose>7.3545741 1.1539879 0.036817853 0 0 1.9336971</pose>
+          <pose>7.3545741 1.1539879 0.025511158 0 0 1.9336971</pose>
           <geometry>
             <box>
-              <size>0.20805133 0.20833667 0.073635707</size>
+              <size>0.20805133 0.20833667 0.051022317</size>
             </box>
           </geometry>
           <material>
@@ -6620,10 +6620,10 @@
           </material>
         </visual>
         <collision name="rock_08_collision">
-          <pose>7.2951768 1.3161793 0.020016238 0 0 2.0568184</pose>
+          <pose>7.2951768 1.3161793 0.015010148 0 0 2.0568184</pose>
           <geometry>
             <box>
-              <size>0.17588546 0.16959817 0.040032475</size>
+              <size>0.17588546 0.16959817 0.030020297</size>
             </box>
           </geometry>
           <surface>
@@ -6636,10 +6636,10 @@
           </surface>
         </collision>
         <visual name="rock_08_visual">
-          <pose>7.2951768 1.3161793 0.020016238 0 0 2.0568184</pose>
+          <pose>7.2951768 1.3161793 0.015010148 0 0 2.0568184</pose>
           <geometry>
             <box>
-              <size>0.17588546 0.16959817 0.040032475</size>
+              <size>0.17588546 0.16959817 0.030020297</size>
             </box>
           </geometry>
           <material>
@@ -6648,10 +6648,10 @@
           </material>
         </visual>
         <collision name="rock_09_collision">
-          <pose>7.1079833 1.0652962 0.028548056 0 0 0.53310124</pose>
+          <pose>7.1079833 1.0652962 0.020342535 0 0 0.53310124</pose>
           <geometry>
             <box>
-              <size>0.23715351 0.19552297 0.057096112</size>
+              <size>0.23715351 0.19552297 0.04068507</size>
             </box>
           </geometry>
           <surface>
@@ -6664,10 +6664,10 @@
           </surface>
         </collision>
         <visual name="rock_09_visual">
-          <pose>7.1079833 1.0652962 0.028548056 0 0 0.53310124</pose>
+          <pose>7.1079833 1.0652962 0.020342535 0 0 0.53310124</pose>
           <geometry>
             <box>
-              <size>0.23715351 0.19552297 0.057096112</size>
+              <size>0.23715351 0.19552297 0.04068507</size>
             </box>
           </geometry>
           <material>
@@ -6676,10 +6676,10 @@
           </material>
         </visual>
         <collision name="rock_10_collision">
-          <pose>7.6782974 1.1641024 0.045317634 0 0 2.1136499</pose>
+          <pose>7.6782974 1.1641024 0.030823521 0 0 2.1136499</pose>
           <geometry>
             <box>
-              <size>0.22639505 0.19013658 0.090635268</size>
+              <size>0.22639505 0.19013658 0.061647043</size>
             </box>
           </geometry>
           <surface>
@@ -6692,10 +6692,10 @@
           </surface>
         </collision>
         <visual name="rock_10_visual">
-          <pose>7.6782974 1.1641024 0.045317634 0 0 2.1136499</pose>
+          <pose>7.6782974 1.1641024 0.030823521 0 0 2.1136499</pose>
           <geometry>
             <box>
-              <size>0.22639505 0.19013658 0.090635268</size>
+              <size>0.22639505 0.19013658 0.061647043</size>
             </box>
           </geometry>
           <material>
@@ -6704,10 +6704,10 @@
           </material>
         </visual>
         <collision name="rock_11_collision">
-          <pose>7.431861 1.1982642 0.020977016 0 0 0.22879663</pose>
+          <pose>7.431861 1.1982642 0.015610635 0 0 0.22879663</pose>
           <geometry>
             <box>
-              <size>0.18176772 0.20196852 0.041954031</size>
+              <size>0.18176772 0.20196852 0.031221269</size>
             </box>
           </geometry>
           <surface>
@@ -6720,10 +6720,10 @@
           </surface>
         </collision>
         <visual name="rock_11_visual">
-          <pose>7.431861 1.1982642 0.020977016 0 0 0.22879663</pose>
+          <pose>7.431861 1.1982642 0.015610635 0 0 0.22879663</pose>
           <geometry>
             <box>
-              <size>0.18176772 0.20196852 0.041954031</size>
+              <size>0.18176772 0.20196852 0.031221269</size>
             </box>
           </geometry>
           <material>
