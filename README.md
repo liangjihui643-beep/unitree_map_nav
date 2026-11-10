@@ -1,117 +1,145 @@
-# Unitree Noetic 地图与导航工作区
+# Unitree Go1 “废墟智援”比赛仿真工作区
 
-上游仓库：<https://github.com/macc-n/ros_unitree>。
+这个项目在宇树开源仿真 [macc-n/ros_unitree](https://github.com/macc-n/ros_unitree) 的基础上，用 **ROS Noetic + Gazebo 11** 复现了 **Go1 四足机器人**的仿真，并按照《人工智能+竞赛》“废墟智援”赛题附录，搭建了一座 **12×10 米比赛场地的示意模型**：
 
-本目录用于复现上游的 **Go1** 仿真，并新增了比赛场地示意模型；尚未完成Go2适配或足球检测。
+- 上下坡（约 12°）、S 弯、死胡同（需要倒退退出）
+- 五处碎石堆（每处 12 块可碰撞石块）
+- 三种管道：过窄应放弃的方管、可通过的圆管、限高方涵
+- 起点 / 终点地面标记
 
-比赛场景启动：`./run_competition.sh mapping`。包含上下坡、S弯、死胡同、五处碎石和三种管道，见 [比赛场地说明](src/unitree_competition/README.md)。原房间演示继续使用 `./run_demo.sh`。
+目前已跑通的能力：Go1 站立与低速行走、Gmapping 激光建图、AMCL 定位 + move_base/DWA 到点导航（原房间场景误差约 0.056 米）。
 
-已在本机完成编译和运行验证：站立、约 1.38 米的受控行走、Gmapping 建图并保存地图、AMCL 定位和 move_base/DWA 到点导航。最终二维避障配置在图形界面模式下的目标点误差约 0.056 米；这是当前简单房间场景的单次验证结果，不代表比赛场景性能。
+![比赛场地 Gazebo 截图](src/unitree_competition/docs/gazebo_preview.png)
 
-上游版本：`0c7b48ade880fd9096d196123b3f9c98ea1131b3`。环境和额外依赖版本记录在 `config/environment.json`，上游修改记录在 `patches/ros_unitree-noetic.patch`。外层本地Git仓库的场景开发分支是 `feat/competition-arena`；上游目录保持独立克隆，通过固定版本和补丁复现。
+![比赛场地平面图](src/unitree_competition/docs/arena_plan.png)
 
-## 目录
+> 注意：场地是按赛题附图做的**示意重建**，尺寸取自图中标注，细节是建模选择，**最终以组委会公布的场地为准**。
 
-- `src/ros_unitree/`：克隆的上游代码。
-- `src/unitree_local_demo/`：本地房间场景、组合 launch 和控制器启动脚本。
-- `src/unitree_competition/`：参数化比赛场地、坡面模型、生成器及平面图。
-- `.venv/`：Python 3.8 虚拟环境，使用系统 ROS Python 包。
-- `.runtime/root/`：新增 ROS 控制器和 LCM 等依赖的本地安装前缀。
-- `build/`、`devel/`：Catkin 编译输出。
-- `logs/`：编译、运行和验证记录。
+## 当前实现与比赛任务的对应关系
 
-系统已有的 Ubuntu 20.04、ROS Noetic、Gazebo 11 和 C++ 编译工具继续复用。Python 环境、额外依赖、源码、编译产物和项目 ROS 日志均保存在本目录；这不是包含完整操作系统的容器。
+| 比赛要求 | 本项目现状 |
+| --- | --- |
+| 任务 1：非结构化地形运动控制、动态避障、路径规划 | 场地模型已完成；Go1 可遥控通行；Gmapping + AMCL + DWA 导航基线已跑通（仅在简单房间验证过） |
+| 上下坡 / 狭窄通道 / 乱石越障 | 场景中已建模（坡 12°、S 弯弯宽 1.2 m、五处碎石），**尚不能自主稳定通过** |
+| 任务 2：生命目标识别与信息采集 | **尚未实现**（需要相机检测算法，后续方向） |
+| 隧道 1 识别后放弃、倒退决策、低姿态过管 | 尚未实现 |
+| Go2 机体、原生雷达、D435i 相机、弱光、动态障碍 | 尚未适配 |
 
-## 编译
+一句话总结：**场景和导航基线已经能跑，自主完赛能力和识别能力是下一步开发重点。** 详见 [比赛场地包说明](src/unitree_competition/README.md)。
+
+## 环境要求
+
+| 项目 | 要求 |
+| --- | --- |
+| 操作系统 | Ubuntu 20.04 |
+| ROS | ROS Noetic（`ros-noetic-desktop-full`） |
+| Gazebo | Gazebo 11（随 ROS Noetic 自带） |
+| Python | 系统 Python 3.8 + `python3-venv` |
+| 硬件建议 | 内存 ≥ 8 GB；虚拟机需开启 3D 加速，否则 Gazebo 可能黑屏 |
+
+本仓库只包含项目代码，**不包含操作系统和 ROS**，需要先自行装好 ROS Noetic。
+
+## 快速开始（5 步跑通比赛场地）
 
 ```bash
-cd /home/l/code/unitree_map_nav
+# 1. 克隆本仓库
+git clone https://github.com/liangjihui643-beep/unitree_map_nav.git
+cd unitree_map_nav
+
+# 2. 下载上游宇树代码并打上本项目的适配补丁
+bash scripts/restore_upstream.sh
+
+# 3. 准备 Python 虚拟环境
+python3 -m venv .venv
+.venv/bin/pip install pyyaml matplotlib
+
+# 4. 安装额外 ROS 依赖（LCM、gmapping、控制器等；有 sudo 直接装，没有则自动下载解包到本地）
+bash scripts/install_deps.sh
+
+# 5. 编译
 ./scripts/build.sh
 ```
 
-## 建图
+启动比赛场地（Gazebo + RViz）：
 
 ```bash
-cd /home/l/code/unitree_map_nav
-./run_demo.sh mapping
+./run_competition.sh mapping
 ```
 
-控制器自动通过原有键盘接口进入站立和 MoveBase 模式。另一个终端可发送低速运动指令：
+看到 Gazebo 里的场地和 RViz 里的激光点云后，在**另一个终端**里遥控机器人慢慢走：
 
 ```bash
-source /home/l/code/unitree_map_nav/activate.sh
-rostopic pub -r 10 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.1}, angular: {z: 0.0}}'
-```
-
-结束速度命令后，要明确发送零速度停车：
-
-```bash
+source activate.sh
+# 以 0.08 m/s 低速前进（约 1.4 m 身高步态下比较稳）
+rostopic pub -r 10 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.08}}'
+# 想停下：先按 Ctrl+C 中断上面的命令，再发一条零速度
 rostopic pub -1 /cmd_vel geometry_msgs/Twist '{}'
 ```
 
-保存地图：
+走完一圈后保存地图，再启动导航模式：
 
 ```bash
-rosrun map_server map_saver -f /home/l/code/unitree_map_nav/src/unitree_local_demo/maps/demo_room
+rosrun map_server map_saver -f src/unitree_competition/maps/competition
+./run_competition.sh navigation
 ```
 
-在启动仿真的终端按 `Ctrl+C` 关闭该次仿真。
+> 新下载的仓库里**没有现成的比赛地图**，`src/unitree_competition/maps/` 需要按上面的步骤自己建。仓库里 `src/unitree_local_demo/maps/demo_room.pgm` 是简单房间场景的示例地图，仅供演示，不能用在比赛场景。
 
-如果演示是通过本目录的后台会话脚本启动的，可先查看或停止：
+## 常用命令
 
-```bash
-source /home/l/code/unitree_map_nav/activate.sh
-python /home/l/code/unitree_map_nav/scripts/session.py status
-python /home/l/code/unitree_map_nav/scripts/session.py stop
+| 目的 | 命令 |
+| --- | --- |
+| 启动比赛场景（建图 / 导航） | `./run_competition.sh mapping` / `./run_competition.sh navigation` |
+| 启动原房间演示 | `./run_demo.sh mapping` / `./run_demo.sh navigation` |
+| 后台启动（不显示窗口） | `python3 scripts/session.py start mapping --scene competition --headless --no-rviz` |
+| 查看 / 停止后台会话 | `python3 scripts/session.py status` / `python3 scripts/session.py stop` |
+| 一键自检（场景、传感器、碰撞） | `source activate.sh && python3 scripts/verify_competition.py` |
+| 重新编译 | `./scripts/build.sh` |
+| 修改场地参数后重建 | 编辑 `src/unitree_competition/config/arena.yaml`，然后 `python src/unitree_competition/scripts/generate_world.py` |
+
+## 目录结构
+
+```
+unitree_map_nav/
+├── run_competition.sh / run_demo.sh   # 一键启动脚本（比赛场地 / 房间场景）
+├── activate.sh                        # source 它获得本工作区的 ROS 环境
+├── scripts/
+│   ├── restore_upstream.sh            # 克隆上游 + 打补丁
+│   ├── install_deps.sh                # 安装额外 ROS 依赖
+│   ├── build.sh                       # catkin_make 编译
+│   ├── session.py                     # 后台启动/停止/查看仿真会话
+│   ├── verify_competition.py          # 比赛场景自检脚本
+│   └── setup_env.bash                 # 环境变量（被 activate.sh 调用）
+├── src/
+│   ├── ros_unitree/                   # 上游宇树代码（git 忽略，由脚本恢复）
+│   ├── unitree_competition/           # 比赛场地：生成器、world、launch、配置、平面图
+│   └── unitree_local_demo/            # 简单房间场景 + 示例地图（入门用）
+├── patches/ros_unitree-noetic.patch   # 对上游的 Noetic 适配修改
+├── config/environment.json            # 上游版本、依赖版本等环境记录
+└── models/                            # 地面、太阳等 Gazebo 基础模型
 ```
 
-同一个工作区不要同时启动建图和导航两个仿真。
+编译产物（`build/`、`devel/`）、虚拟环境（`.venv/`）、本地依赖（`.runtime/`）和日志（`logs/`）都不进入 Git。
 
-## 已知地图导航
+## 常见问题（FAQ）
 
-先结束建图仿真，再启动：
+**Gazebo / RViz 窗口黑屏或打不开？**
+虚拟机请先开启 3D 加速；也可以不显示界面跑：`./run_competition.sh mapping gui:=false rviz:=false`。
 
-```bash
-cd /home/l/code/unitree_map_nav
-./run_demo.sh navigation
-```
+**机器人走两步就摔倒？**
+速度放慢（0.08 m/s 以内），先让机器人站稳再发指令；每次只发一个方向的速度。
 
-在 RViz 使用 `2D Pose Estimate` 设置初始位置，再通过 `2D Nav Goal` 设置导航目标。房间每次重置时，机器人从约 `(0, 0)`、朝向 x 正方向开始。
+**提示端口被占用 / 会话已存在？**
+一次只能跑一个仿真：`python3 scripts/session.py stop` 停掉再启动。
 
-若不需要图形界面：
+**换电脑后编译报错找不到包？**
+确认第 2、4 步做过（恢复上游 + 装依赖），再重新 `./scripts/build.sh`。
 
-```bash
-./run_demo.sh mapping gui:=false rviz:=false
-```
+**想改场地尺寸？**
+改 `src/unitree_competition/config/arena.yaml` 后运行生成器并重启 Gazebo，见 [比赛场地包说明](src/unitree_competition/README.md#修改尺寸及重建)。
 
-ROS master 使用 `11331`，Gazebo master 使用 `11351`，避免与其他工作区默认端口冲突。所有操作终端都应先 `source activate.sh`。
+## 上游代码与许可证
 
-## 运行验证
-
-建图模式启动后，在另一个终端执行：
-
-```bash
-source /home/l/code/unitree_map_nav/activate.sh
-python /home/l/code/unitree_map_nav/scripts/verify_demo.py mapping
-```
-
-它检查激光、IMU、里程计、机器人站立、受控行走及 Gmapping 地图，并保存地图和 JSON 记录。导航模式启动后执行：
-
-```bash
-python /home/l/code/unitree_map_nav/scripts/verify_demo.py navigation
-```
-
-它通过 AMCL 和 move_base 发送目标点，并检查动作返回值及实际位移。Gazebo 真值仅用于验证测量，不输入建图和导航算法。
-
-验证结果位于 `logs/verification_mapping.json` 和 `logs/verification_navigation.json`。是否验证通过应以实际生成的结果为准。
-
-## 本地适配
-
-- 场景 launch 允许指定本目录中的 world 文件，楼梯模型去除上游机器的绝对路径。
-- 导航控制器的初始速度明确置零。
-- 新增本地组合 launch 和 PTY 启动器，依次执行上游键盘的站立与 MoveBase 模式切换，不替换运动算法。
-- 本地二进制依赖通过 `activate.sh` 加入插件和动态库搜索路径。
-- RViz 的路径话题改为实际使用的 GlobalPlanner 和 DWA 话题。
-- 本地房间导航使用二维激光障碍层；原始深度相机的三维体素层与腿部里程计的高度原点不一致，会产生传感器越界告警，因此本地演示关闭该层。深度相机模型和数据发布保留，但本次未验证三维相机避障。
-
-上游在没有实时调度权限时会输出 `setProcessScheduler failed`，本机验证是在普通调度权限下完成的，没有修改系统实时调度配置。
+- 上游：[macc-n/ros_unitree](https://github.com/macc-n/ros_unitree)，固定版本 `0c7b48ade880fd9096d196123b3f9c98ea1131b3`（见 `config/environment.json`）。
+- 上游使用 **BSD-3-Clause** 许可证（Copyright © Unitree Robotics），LICENSE 文件随上游代码一起保留；本项目的适配修改见 `patches/ros_unitree-noetic.patch`。
+- 比赛场地为按赛题附图的示意重建，仅供备赛开发，以组委会发布为准。

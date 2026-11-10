@@ -29,7 +29,7 @@
 先停止已经运行的本工作区会话：
 
 ```bash
-cd /home/l/code/unitree_map_nav
+cd unitree_map_nav
 python3 scripts/session.py stop
 ./run_competition.sh mapping
 ```
@@ -47,7 +47,7 @@ python3 scripts/session.py stop
 在另一个终端低速前进，Ctrl+C停止持续发布后，再发送零速度：
 
 ```bash
-source /home/l/code/unitree_map_nav/activate.sh
+source ./activate.sh
 rostopic pub -r 10 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.08}}'
 # Ctrl+C 后执行：
 rostopic pub -1 /cmd_vel geometry_msgs/Twist '{}'
@@ -56,7 +56,7 @@ rostopic pub -1 /cmd_vel geometry_msgs/Twist '{}'
 完成场地探索后保存地图。默认没有预制的比赛完整地图，不能使用旧房间地图代替：
 
 ```bash
-rosrun map_server map_saver -f /home/l/code/unitree_map_nav/src/unitree_competition/maps/competition
+rosrun map_server map_saver -f src/unitree_competition/maps/competition
 ```
 
 结束建图仿真，再运行 `./run_competition.sh navigation`，也可以传 `map_file:=/绝对路径/地图.yaml`。二维导航沿用原来的Gmapping/AMCL/GlobalPlanner/DWA基线，没有新增比赛自主决策。
@@ -66,7 +66,7 @@ rosrun map_server map_saver -f /home/l/code/unitree_map_nav/src/unitree_competit
 编辑 `config/arena.yaml`，然后：
 
 ```bash
-cd /home/l/code/unitree_map_nav
+cd unitree_map_nav
 source activate.sh
 python src/unitree_competition/scripts/generate_world.py
 gz sdf -k src/unitree_competition/worlds/competition.world
@@ -77,7 +77,7 @@ gz sdf -k src/unitree_competition/worlds/competition.world
 ## 验证及边界
 
 ```bash
-source /home/l/code/unitree_map_nav/activate.sh
+source ./activate.sh
 python scripts/verify_competition.py
 ```
 
@@ -89,6 +89,6 @@ python scripts/verify_competition.py
 
 ## Git结构
 
-外层 `/home/l/code/unitree_map_nav/.git` 管理本地ROS包、配置、启动脚本和上游补丁。`main` 保存可运行的房间基线，`feat/competition-arena` 保存本次比赛场景。
+外层 Git 仓库管理本地ROS包、配置、启动脚本和上游补丁，`main` 保存可运行的房间基线，`feat/competition-arena` 保存本次比赛场景。远程仓库：<https://github.com/liangjihui643-beep/unitree_map_nav>。
 
-`src/ros_unitree/` 保留独立的上游Git克隆，外层忽略该目录；上游URL和固定提交记录在 `config/environment.json`，适配修改记录在 `patches/ros_unitree-noetic.patch`。新检出工作区后可运行 `bash scripts/restore_upstream.sh` 恢复源码与补丁（环境依赖仍需按原工作区配置）。构建产物、虚拟环境、运行依赖及日志不进入Git。本次没有设置外层远程仓库或上传代码。
+`src/ros_unitree/` 保留独立的上游Git克隆，外层忽略该目录；上游URL和固定提交记录在 `config/environment.json`，适配修改记录在 `patches/ros_unitree-noetic.patch`。新检出工作区后可运行 `bash scripts/restore_upstream.sh` 恢复源码与补丁，`bash scripts/install_deps.sh` 安装额外依赖。构建产物、虚拟环境、运行依赖及日志不进入Git。
