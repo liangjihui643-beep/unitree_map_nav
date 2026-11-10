@@ -1,0 +1,40 @@
+<launch>
+  <arg name="mode" default="mapping"/>
+  <arg name="gui" default="true"/>
+  <arg name="rviz" default="true"/>
+  <arg name="map_file" default="$(find unitree_local_demo)/maps/demo_room.yaml"/>
+  <include file="$(find unitree_gazebo)/launch/robot_simulation.launch">
+    <arg name="rname" value="go1"/>
+    <arg name="wname" value="earth"/>
+    <arg name="world_path" value="$(find unitree_local_demo)/worlds/demo_room.world"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="rviz" value="false"/>
+    <arg name="paused" value="false"/>
+  </include>
+  <node pkg="unitree_local_demo" type="boot_controller.py" name="boot_controller" output="screen" required="true"/>
+  <group if="$(eval arg('mode') == 'mapping')">
+    <include file="$(find unitree_navigation)/launch/slam.launch">
+      <arg name="rname" value="go1"/>
+      <arg name="rviz" value="$(arg rviz)"/>
+      <arg name="algorithm" value="gmapping"/>
+    </include>
+  </group>
+  <group if="$(eval arg('mode') == 'navigation')">
+    <include file="$(find unitree_navigation)/launch/navigation.launch">
+      <arg name="rname" value="go1"/>
+      <arg name="rviz" value="$(arg rviz)"/>
+      <arg name="map_file" value="$(arg map_file)"/>
+    </include>
+    <!-- This baseline uses the upstream 2D lidar for navigation. The upstream
+         depth-camera voxel layer assumes a different vertical frame origin. -->
+    <rosparam param="/move_base/global_costmap/plugins">
+      - {name: static_map_layer, type: "costmap_2d::StaticLayer"}
+      - {name: 2d_obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+      - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    </rosparam>
+    <rosparam param="/move_base/local_costmap/plugins">
+      - {name: 2d_obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+      - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    </rosparam>
+  </group>
+</launch>

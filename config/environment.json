@@ -1,0 +1,19 @@
+{
+  "upstream": "https://github.com/macc-n/ros_unitree.git",
+  "revision": "0c7b48ade880fd9096d196123b3f9c98ea1131b3",
+  "robot_tested": "Go1",
+  "os": "Ubuntu 20.04.6",
+  "ros": "Noetic",
+  "gazebo": "11.15.1",
+  "python_environment": "/home/l/code/unitree_map_nav/.venv",
+  "extra_dependencies": [
+    "liblcm-bin_1.3.1+repack1-2.3_amd64.deb",
+    "liblcm-dev_1.3.1+repack1-2.3_amd64.deb",
+    "liblcm1_1.3.1+repack1-2.3_amd64.deb",
+    "ros-noetic-effort-controllers_0.22.0-1focal.20250521.005323_amd64.deb",
+    "ros-noetic-global-planner_1.17.3-1focal.20250521.005728_amd64.deb",
+    "ros-noetic-joint-trajectory-controller_0.22.0-1focal.20250521.005320_amd64.deb",
+    "ros-noetic-slam-gmapping_1.4.2-1focal.20250520.022155_amd64.deb"
+  ],
+  "local_patch": "/home/l/code/unitree_map_nav/logs/upstream_local.patch"
+}

@@ -1,0 +1,69 @@
+diff --git a/unitree_guide/unitree_guide/include/FSM/State_move_base.h b/unitree_guide/unitree_guide/include/FSM/State_move_base.h
+index a4f4cb9..befb59d 100644
+--- a/unitree_guide/unitree_guide/include/FSM/State_move_base.h
++++ b/unitree_guide/unitree_guide/include/FSM/State_move_base.h
+@@ -21,10 +21,10 @@ private:
+     void twistCallback(const geometry_msgs::Twist& msg);
+     ros::NodeHandle _nm;
+     ros::Subscriber _cmdSub;
+-    double _vx, _vy;
+-    double _wz;
++    double _vx = 0.0, _vy = 0.0;
++    double _wz = 0.0;
+ };
+ 
+ #endif  // STATE_MOVE_BASE_H
+ 
+-#endif  // COMPILE_WITH_MOVE_BASE
+\ No newline at end of file
++#endif  // COMPILE_WITH_MOVE_BASE
+diff --git a/unitree_guide/unitree_move_base/rviz/move_base.rviz b/unitree_guide/unitree_move_base/rviz/move_base.rviz
+index 56ffbe9..b78b17a 100644
+--- a/unitree_guide/unitree_move_base/rviz/move_base.rviz
++++ b/unitree_guide/unitree_move_base/rviz/move_base.rviz
+@@ -387,7 +387,7 @@ Visualization Manager:
+       Radius: 0.029999999329447746
+       Shaft Diameter: 0.10000000149011612
+       Shaft Length: 0.10000000149011612
+-      Topic: /move_base/TrajectoryPlannerROS/local_plan
++      Topic: /move_base/DWAPlannerROS/local_plan
+       Unreliable: false
+       Value: true
+     - Alpha: 1
+@@ -411,7 +411,7 @@ Visualization Manager:
+       Radius: 0.029999999329447746
+       Shaft Diameter: 0.10000000149011612
+       Shaft Length: 0.10000000149011612
+-      Topic: /move_base/TrajectoryPlannerROS/global_plan
++      Topic: /move_base/GlobalPlanner/plan
+       Unreliable: false
+       Value: true
+     - Alpha: 1
+diff --git a/unitree_ros/unitree_gazebo/launch/robot_simulation.launch b/unitree_ros/unitree_gazebo/launch/robot_simulation.launch
+index 28c0b2d..93266fa 100644
+--- a/unitree_ros/unitree_gazebo/launch/robot_simulation.launch
++++ b/unitree_ros/unitree_gazebo/launch/robot_simulation.launch
+@@ -12,8 +12,8 @@
+     <!-- Debug mode will hung up the robot, use "true" or "false" to switch it. -->
+     <arg name="user_debug" default="false"/>
+ 
+-    <arg if="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" value="$(find unitree_gazebo)/worlds/$(arg wname).world" />
+-    <arg unless="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" value="$(find gazebo_worlds)/gazebo/worlds/$(arg wname).world" />
++    <arg if="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" default="$(find unitree_gazebo)/worlds/$(arg wname).world" />
++    <arg unless="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" default="$(find gazebo_worlds)/gazebo/worlds/$(arg wname).world" />
+     
+     <include file="$(find gazebo_ros)/launch/empty_world.launch">
+         <arg name="world_name" value="$(arg world_path)"/>
+diff --git a/unitree_ros/unitree_gazebo/worlds/stairs.world b/unitree_ros/unitree_gazebo/worlds/stairs.world
+index cfa7fb7..0e905e9 100644
+--- a/unitree_ros/unitree_gazebo/worlds/stairs.world
++++ b/unitree_ros/unitree_gazebo/worlds/stairs.world
+@@ -109,7 +109,7 @@
+         </model>
+ 
+         <include>
+-            <uri>model:///home/unitree/catkin_ws/src/ros_unitree/unitree_ros/unitree_gazebo/worlds/building_editor_models/stairs</uri>
++            <uri>model://stairs</uri>
+         </include>
+ 
+     </world>
