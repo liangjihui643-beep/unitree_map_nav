@@ -15,5 +15,5 @@
     "ros-noetic-joint-trajectory-controller_0.22.0-1focal.20250521.005320_amd64.deb",
     "ros-noetic-slam-gmapping_1.4.2-1focal.20250520.022155_amd64.deb"
   ],
-  "local_patch": "/home/l/code/unitree_map_nav/logs/upstream_local.patch"
+  "local_patch": "/home/l/code/unitree_map_nav/patches/ros_unitree-noetic.patch"
 }

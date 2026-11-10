@@ -1,0 +1,37 @@
+# PDF 第6页标注的参考尺寸；最终以组委会后续配置为准。
+# 世界坐标：起点中心(0,0)，+Y向图上方，+X向图右方，长度单位m。
+arena:
+  size: [12.0, 10.0]
+  minimum: [-0.75, -0.75]
+  wall_thickness: 0.12
+  wall_height: 0.75
+spawn: [0.0, 0.0, 0.6, 1.5707963267948966]
+start: {center: [0.0, 0.0], size: [1.5, 1.5]}
+finish: {center: [10.1, 8.1], size: [2.0, 2.0]}
+slope:
+  angle_deg: 12.0
+  height: 0.45
+  width: 1.2
+  # 以下位置和转弯平台为按示意图安排的建模选择，不是官方测量坐标。
+  uphill_start: [0.0, 1.3]
+  turn_y: 7.2
+  downhill_start: [2.4, 7.2]
+s_bend:
+  clear_width: 1.2
+  radius: 1.0
+  entry: [4.8, 7.2]
+  wall_height: 0.65
+dead_end:
+  clear_width: 1.2
+  length: 2.0
+  entrance: [5.6, 2.6]
+rubble:
+  height_range: [0.04, 0.12]
+  centers: [[7.0, 2.8], [8.2, 2.0], [9.8, 0.8], [7.1, 0.7], [9.8, 3.2]]
+  patch_radius: 0.45
+  rocks_per_patch: 12
+  seed: 42
+tunnels:
+  narrow: {center: [7.2, 6.6], width: 0.2, height: 0.6, length: 1.2}
+  round: {center: [8.0, 4.8], inner_diameter: 1.0, length: 2.0, shell: 0.08, segments: 32}
+  rectangular: {center: [9.7, 4.8], width: 1.2, height: 0.6, length: 1.5, shell: 0.1}

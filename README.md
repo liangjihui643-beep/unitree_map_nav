@@ -2,16 +2,19 @@
 
 上游仓库：<https://github.com/macc-n/ros_unitree>。
 
-本目录用于复现上游的 **Go1** 仿真，不表示已经完成 Go2 适配，也不包含比赛废墟场景或足球检测。
+本目录用于复现上游的 **Go1** 仿真，并新增了比赛场地示意模型；尚未完成Go2适配或足球检测。
+
+比赛场景启动：`./run_competition.sh mapping`。包含上下坡、S弯、死胡同、五处碎石和三种管道，见 [比赛场地说明](src/unitree_competition/README.md)。原房间演示继续使用 `./run_demo.sh`。
 
 已在本机完成编译和运行验证：站立、约 1.38 米的受控行走、Gmapping 建图并保存地图、AMCL 定位和 move_base/DWA 到点导航。最终二维避障配置在图形界面模式下的目标点误差约 0.056 米；这是当前简单房间场景的单次验证结果，不代表比赛场景性能。
 
-上游版本：`0c7b48ade880fd9096d196123b3f9c98ea1131b3`。环境和额外依赖版本记录在 `logs/environment.json`，上游修改记录在 `logs/upstream_local.patch`。
+上游版本：`0c7b48ade880fd9096d196123b3f9c98ea1131b3`。环境和额外依赖版本记录在 `config/environment.json`，上游修改记录在 `patches/ros_unitree-noetic.patch`。外层本地Git仓库的场景开发分支是 `feat/competition-arena`；上游目录保持独立克隆，通过固定版本和补丁复现。
 
 ## 目录
 
 - `src/ros_unitree/`：克隆的上游代码。
 - `src/unitree_local_demo/`：本地房间场景、组合 launch 和控制器启动脚本。
+- `src/unitree_competition/`：参数化比赛场地、坡面模型、生成器及平面图。
 - `.venv/`：Python 3.8 虚拟环境，使用系统 ROS Python 包。
 - `.runtime/root/`：新增 ROS 控制器和 LCM 等依赖的本地安装前缀。
 - `build/`、`devel/`：Catkin 编译输出。

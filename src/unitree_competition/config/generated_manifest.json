@@ -1,0 +1,36 @@
+{
+  "arena_size": [
+    12.0,
+    10.0
+  ],
+  "spawn": [
+    0.0,
+    0.0,
+    0.6,
+    1.5707963267948966
+  ],
+  "slope_run": 2.1170835492653044,
+  "models": [
+    "arena_boundary",
+    "start_pad",
+    "finish_pad",
+    "uphill",
+    "downhill",
+    "slope_turn_platform",
+    "slope_guard_walls",
+    "s_bend_walls",
+    "dead_end",
+    "rubble_patch_1",
+    "rubble_patch_2",
+    "rubble_patch_3",
+    "rubble_patch_4",
+    "rubble_patch_5",
+    "tunnel_1_reject",
+    "tunnel_3_culvert",
+    "tunnel_2_round_pipe",
+    "finish_lane_partition"
+  ],
+  "collision_shapes": 274,
+  "rubble_patches": 5,
+  "seed": 42
+}

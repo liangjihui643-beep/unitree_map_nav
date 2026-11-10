@@ -40,10 +40,17 @@ index 56ffbe9..b78b17a 100644
        Value: true
      - Alpha: 1
 diff --git a/unitree_ros/unitree_gazebo/launch/robot_simulation.launch b/unitree_ros/unitree_gazebo/launch/robot_simulation.launch
-index 28c0b2d..93266fa 100644
+index 28c0b2d..6d2e231 100644
 --- a/unitree_ros/unitree_gazebo/launch/robot_simulation.launch
 +++ b/unitree_ros/unitree_gazebo/launch/robot_simulation.launch
-@@ -12,8 +12,8 @@
+@@ -9,11 +9,15 @@
+     <arg name="gui" default="true"/>
+     <arg name="headless" default="false"/>
+     <arg name="debug" default="false"/>
++    <arg name="spawn_x" default="0"/>
++    <arg name="spawn_y" default="0"/>
++    <arg name="spawn_z" default="0.6"/>
++    <arg name="spawn_yaw" default="0"/>
      <!-- Debug mode will hung up the robot, use "true" or "false" to switch it. -->
      <arg name="user_debug" default="false"/>
  
@@ -54,6 +61,15 @@ index 28c0b2d..93266fa 100644
      
      <include file="$(find gazebo_ros)/launch/empty_world.launch">
          <arg name="world_name" value="$(arg world_path)"/>
+@@ -32,7 +36,7 @@
+     <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+     <!-- Set trunk and joint positions at startup -->
+     <node pkg="gazebo_ros" type="spawn_model" name="urdf_spawner" respawn="false" output="screen"
+-          args="-urdf -z 0.6 -model $(arg rname)_gazebo -param robot_description -unpause"/>
++          args="-urdf -x $(arg spawn_x) -y $(arg spawn_y) -z $(arg spawn_z) -Y $(arg spawn_yaw) -model $(arg rname)_gazebo -param robot_description -unpause"/>
+ 
+     <!-- Load joint controller configurations from YAML file to parameter server -->
+     <rosparam file="$(arg dollar)$(arg robot_path)/config/robot_control.yaml" command="load"/>
 diff --git a/unitree_ros/unitree_gazebo/worlds/stairs.world b/unitree_ros/unitree_gazebo/worlds/stairs.world
 index cfa7fb7..0e905e9 100644
 --- a/unitree_ros/unitree_gazebo/worlds/stairs.world

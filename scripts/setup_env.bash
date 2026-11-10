@@ -33,7 +33,7 @@ export ROS_IP=127.0.0.1
 unset ROS_HOSTNAME
 export GAZEBO_MASTER_URI="${UNITREE_GAZEBO_MASTER_URI:-http://127.0.0.1:11351}"
 export GAZEBO_MODEL_DATABASE_URI=""
-export GAZEBO_MODEL_PATH="$UNITREE_MAP_NAV_ROOT/models:$UNITREE_MAP_NAV_ROOT/src/ros_unitree/unitree_ros/unitree_gazebo/worlds/building_editor_models${GAZEBO_MODEL_PATH:+:$GAZEBO_MODEL_PATH}"
+export GAZEBO_MODEL_PATH="$UNITREE_MAP_NAV_ROOT/models:$UNITREE_MAP_NAV_ROOT/src/unitree_competition/models:$UNITREE_MAP_NAV_ROOT/src/ros_unitree/unitree_ros/unitree_gazebo/worlds/building_editor_models${GAZEBO_MODEL_PATH:+:$GAZEBO_MODEL_PATH}"
 export GAZEBO_PLUGIN_PATH="$UNITREE_MAP_NAV_ROOT/devel/lib:$_unitree_local_ros/lib:/opt/ros/noetic/lib${GAZEBO_PLUGIN_PATH:+:$GAZEBO_PLUGIN_PATH}"
 export GAZEBO_RESOURCE_PATH="/usr/share/gazebo-11${GAZEBO_RESOURCE_PATH:+:$GAZEBO_RESOURCE_PATH}"
 export GAZEBO_LOG_PATH="$UNITREE_MAP_NAV_ROOT/logs/gazebo"

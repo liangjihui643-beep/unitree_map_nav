@@ -25,6 +25,7 @@ def main():
     parser.add_argument("mode", nargs="?", default="mapping", choices=["mapping", "navigation"])
     parser.add_argument("--headless", action="store_true")
     parser.add_argument("--no-rviz", action="store_true")
+    parser.add_argument("--scene", choices=["room", "competition"], default="room")
     args = parser.parse_args()
     active = json.loads(record.read_text()) if record.exists() else None
     alive = bool(active and start_time(active["pid"]) == active["start_time"])
@@ -43,16 +44,17 @@ def main():
     else:
         if alive:
             raise SystemExit("A workspace demo is already running; stop it first")
-        command = [str(root / "run_demo.sh"), args.mode,
+        launcher = "run_competition.sh" if args.scene == "competition" else "run_demo.sh"
+        command = [str(root / launcher), args.mode,
                    "gui:=" + str(not args.headless).lower(),
                    "rviz:=" + str(not args.no_rviz).lower()]
-        log = root / "logs" / (args.mode + ".log")
+        log = root / "logs" / (args.scene + "_" + args.mode + ".log")
         with log.open("w") as output:
             process = subprocess.Popen(command, cwd=str(root), stdin=subprocess.DEVNULL,
                                        stdout=output, stderr=subprocess.STDOUT,
                                        start_new_session=True)
         active = {"pid": process.pid, "start_time": start_time(process.pid),
-                  "mode": args.mode, "log": str(log)}
+                  "mode": args.mode, "scene": args.scene, "log": str(log)}
         record.write_text(json.dumps(active, indent=2) + "\n")
         time.sleep(2)
         if process.poll() is not None:
