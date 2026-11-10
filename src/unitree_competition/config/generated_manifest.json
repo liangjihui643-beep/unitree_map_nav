@@ -18,6 +18,7 @@
     "downhill",
     "slope_turn_platform",
     "slope_guard_walls",
+    "start_entry_partition",
     "s_bend_walls",
     "dead_end",
     "rubble_patch_1",
@@ -30,7 +31,7 @@
     "tunnel_2_round_pipe",
     "finish_lane_partition"
   ],
-  "collision_shapes": 274,
+  "collision_shapes": 275,
   "rubble_patches": 5,
   "seed": 42
 }

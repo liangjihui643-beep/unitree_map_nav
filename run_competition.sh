@@ -8,8 +8,8 @@ if [[ -z "${DISPLAY:-}" && -S /tmp/.X11-unix/X0 ]]; then
 fi
 competition_mode="${1:-mapping}"
 if [[ $# -gt 0 ]]; then shift; fi
-if [[ "$competition_mode" != mapping && "$competition_mode" != navigation ]]; then
-  echo "Usage: $0 [mapping|navigation] [gui:=false] [rviz:=false] [map_file:=/path/map.yaml]" >&2
+if [[ "$competition_mode" != mapping && "$competition_mode" != navigation && "$competition_mode" != explore ]]; then
+  echo "Usage: $0 [mapping|navigation|explore] [gui:=false] [rviz:=false] [map_file:=/path/map.yaml]" >&2
   exit 2
 fi
 # roslaunch checks map_file overrides too; the default is deliberately separate.

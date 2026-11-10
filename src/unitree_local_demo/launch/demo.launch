@@ -28,6 +28,75 @@
       <arg name="algorithm" value="gmapping"/>
     </include>
   </group>
+  <group if="$(eval arg('mode') == 'explore')">
+    <!-- 前沿自主探索：Gmapping 建图 + move_base 导航 + explore_lite 自动选目标 -->
+    <include file="$(find unitree_navigation)/launch/slam.launch">
+      <arg name="rname" value="go1"/>
+      <arg name="rviz" value="$(arg rviz)"/>
+      <arg name="algorithm" value="gmapping"/>
+    </include>
+    <!-- 探索需要"静止也能出图"：降低 gmapping 运动门限并启用定时处理，
+         打破"没地图→explore 不动→没运动→gmapping 不更新"的死锁 -->
+    <param name="/slam_gmapping/linearUpdate" value="0.1"/>
+    <param name="/slam_gmapping/angularUpdate" value="0.12"/>
+    <param name="/slam_gmapping/map_update_interval" value="3.0"/>
+    <param name="/slam_gmapping/temporalUpdate" value="1.0"/>
+    <!-- 地图只覆盖场地区域：前沿搜索和代价地图处理量从 390 万格降到 7 万格 -->
+    <param name="/slam_gmapping/xmin" value="-2.0"/>
+    <param name="/slam_gmapping/ymin" value="-2.0"/>
+    <param name="/slam_gmapping/xmax" value="12.5"/>
+    <param name="/slam_gmapping/ymax" value="11.0"/>
+    <!-- 参数覆盖必须先于 move_base 启动写入参数服务器。
+         关键：gmapping 未知区(-1)必须映射为代价地图的未知(255)，
+         否则整张地图被当成空闲，explore_lite 找不到任何探索边界 -->
+    <rosparam ns="/move_base">
+      global_costmap:
+        update_frequency: 2.0
+        inflation_layer: {inflation_radius: 0.35, cost_scaling_factor: 5.0}
+      local_costmap:
+        update_frequency: 5.0
+        inflation_layer: {inflation_radius: 0.30, cost_scaling_factor: 5.0}
+      DWAPlannerROS:
+        max_vel_x: 0.18
+        min_vel_x: -0.05
+        max_vel_trans: 0.18
+        acc_lim_x: 0.4
+        acc_lim_theta: 1.0
+        max_vel_rot: 0.8
+        min_vel_rot: -0.8
+        sim_time: 2.0
+        xy_goal_tolerance: 0.20
+        path_distance_bias: 32.0
+        goal_distance_bias: 20.0
+    </rosparam>
+    <include file="$(find unitree_move_base)/launch/move_base.launch">
+      <arg name="rname" value="go1"/>
+    </include>
+    <!-- 只用二维激光层（与 navigation 模式一致，不使用 3D 相机体素层） -->
+    <rosparam param="/move_base/global_costmap/plugins">
+      - {name: static_map_layer, type: "costmap_2d::StaticLayer"}
+      - {name: 2d_obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+      - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    </rosparam>
+    <rosparam param="/move_base/local_costmap/plugins">
+      - {name: 2d_obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+      - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    </rosparam>
+    <node pkg="explore_lite" type="explore" name="explore_lite" output="screen"
+          launch-prefix="$(find unitree_competition)/scripts/wait_map_ready.sh">
+      <!-- 与 explore_lite 官方 explore.launch 一致：直接基于 SLAM 地图做前沿检测 -->
+      <param name="robot_base_frame" value="base"/>
+      <param name="costmap_topic" value="/map"/>
+      <param name="costmap_updates_topic" value="/map_updates"/>
+      <param name="planner_frequency" value="0.33"/>
+      <param name="progress_timeout" value="30.0"/>
+      <param name="potential_scale" value="3.0"/>
+      <param name="orientation_scale" value="0.0"/>
+      <param name="gain_scale" value="1.0"/>
+      <param name="transform_tolerance" value="0.3"/>
+      <param name="min_frontier_size" value="0.5"/>
+    </node>
+  </group>
   <group if="$(eval arg('mode') == 'navigation')">
     <include file="$(find unitree_navigation)/launch/navigation.launch">
       <arg name="rname" value="go1"/>

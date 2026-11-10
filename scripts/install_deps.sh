@@ -27,5 +27,8 @@ else
   for deb in "$debs_dir"/*.deb; do
     dpkg -x "$deb" "$prefix"
   done
+  # rosrun/roslaunch 依靠 .catkin 标记定位 <prefix>/lib/<pkg> 下的可执行文件
+  mkdir -p "$prefix/opt/ros/noetic"
+  touch "$prefix/opt/ros/noetic/.catkin"
   echo "解包完成：$prefix"
 fi

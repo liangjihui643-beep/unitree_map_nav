@@ -39,6 +39,19 @@ index 56ffbe9..b78b17a 100644
        Unreliable: false
        Value: true
      - Alpha: 1
+diff --git a/unitree_guide/unitree_navigation/launch/slam/gmapping.launch b/unitree_guide/unitree_navigation/launch/slam/gmapping.launch
+index d4bf8db..c9a0357 100644
+--- a/unitree_guide/unitree_navigation/launch/slam/gmapping.launch
++++ b/unitree_guide/unitree_navigation/launch/slam/gmapping.launch
+@@ -7,7 +7,7 @@
+     <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" args="scan:=$(arg scan)">
+         <param name="base_frame" value="$(arg base_frame)" />
+         <param name="odom_frame" value="$(arg odom_frame)" />
+-        <param name="map_frame"  value="/$(arg frame_prefix)map" />
++        <param name="map_frame"  value="$(arg frame_prefix)map" />
+ 
+         <param name="map_update_interval" value="15.0"/>
+         <param name="maxUrange" value="5.0"/>
 diff --git a/unitree_ros/unitree_gazebo/launch/robot_simulation.launch b/unitree_ros/unitree_gazebo/launch/robot_simulation.launch
 index 28c0b2d..6d2e231 100644
 --- a/unitree_ros/unitree_gazebo/launch/robot_simulation.launch

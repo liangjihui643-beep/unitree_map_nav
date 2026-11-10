@@ -142,6 +142,9 @@ wall(rails, 'inner', (ux+width/2+t/2, uy), (ux+width/2+t/2, turn_y-width/2-t), 1
 wall(rails, 'outer', (ux-width/2-t/2, uy), (ux-width/2-t/2, turn_y+width/2+t), 1.0, t)
 wall(rails, 'north', (ux-width/2, turn_y+width/2+t/2), (C['s_bend']['entry'][0], turn_y+width/2+t/2), 1.0, t)
 wall(rails, 'south', (ux+width/2, turn_y-width/2-t/2), (C['s_bend']['entry'][0], turn_y-width/2-t/2), 1.0, t)
+# 封死起点东侧平地：起点区唯一出口是上坡道（inner 导轨向场地边界延伸）。
+partition = model('start_entry_partition')
+wall(partition, 'east_gate', (ux+width/2+t/2, y0), (ux+width/2+t/2, uy), wh, t)
 
 s = C['s_bend']
 entry_x, entry_y = s['entry']
@@ -262,13 +265,15 @@ for center, size, yaw, color in FOOTPRINTS:
               for x, y in [(-size[0]/2, -size[1]/2), (size[0]/2, -size[1]/2),
                            (size[0]/2, size[1]/2), (-size[0]/2, size[1]/2)]]
     ax.add_patch(Polygon(points, facecolor=color, edgecolor='none'))
-route = [(0, 0), (0, 7.2), (4.8, 7.2)] + route + [(6.1, 3.2), (6.2, 4.8), (10.8, 4.8), (10.8, 5.9), (10.1, 8.1)]
-ax.plot(*zip(*route), '--', color='#e89e22', lw=2.2, label='Reference route (not an autonomous trajectory)')
-labels = [('START', (0, 0)), ('UP 12 deg', (0, 2.5)), ('0.45 m deck', (1.3, 7.2)),
-          ('DOWN 12 deg', (3.35, 7.2)), ('S BEND\n1.2 m clear', (4.8, 6.2)),
-          ('DEAD END\n1.2 x 2 m', (ex, (ey+bottom)/2)), ('5 RUBBLE PATCHES\n4-12 cm', (8.0, 1.1)),
-          ('1: REJECT\n0.2 m wide', (7.2, 7.7)), ('2: ROUND\nID 1.0 m, L 2 m', (7.8, 5.65)),
-          ('3: CULVERT\n1.2 x 0.6 x 1.5 m', (9.9, 3.7)), ('FINISH', (10.1, 8.1))]
+route = ([(0, -0.4), (0, 7.2), (2.4, 7.2), (4.8, 7.2)] + route
+         + [(6.0, 3.2), (7.6, 3.2), (8.0, 4.8), (10.5, 4.8), (10.4, 5.9), (10.1, 8.1)])
+ax.plot(*zip(*route), '--', color='#e89e22', lw=2.2, label='Reference route L1->L3 (not an autonomous trajectory)')
+labels = [('START\nL1: 直行上坡', (0, -0.15)), ('UP 12 deg\n(from start)', (0, 1.9)), ('0.45 m deck', (1.3, 7.2)),
+          ('DOWN 12 deg', (3.35, 7.2)), ('S BEND (L2)\n1.2 m clear', (4.8, 6.2)),
+          ('DEAD END branch\n1.2 x 2 m', (ex, (ey+bottom)/2)),
+          ('OBSTACLE FIELD (L2/L3)\n5 rubble patches', (7.3, 2.1)),
+          ('1: REJECT\n0.2 m wide', (7.2, 7.7)), ('2: ROUND (L3)\nID 1.0 m, L 2 m', (7.8, 5.65)),
+          ('3: CULVERT (L3)\n1.2 x 0.6 x 1.5 m', (9.9, 3.7)), ('FINISH', (10.1, 8.1))]
 for label, position in labels:
     ax.text(*position, label, ha='center', va='center', fontsize=9,
             bbox=dict(boxstyle='round,pad=.22', facecolor='white', alpha=.85, edgecolor='#aaaaaa'))

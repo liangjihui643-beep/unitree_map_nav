@@ -19,13 +19,19 @@
 
 | 比赛要求 | 本项目现状 |
 | --- | --- |
-| 任务 1：非结构化地形运动控制、动态避障、路径规划 | 场地模型已完成；Go1 可遥控通行；Gmapping + AMCL + DWA 导航基线已跑通（仅在简单房间验证过） |
-| 上下坡 / 狭窄通道 / 乱石越障 | 场景中已建模（坡 12°、S 弯弯宽 1.2 m、五处碎石），**尚不能自主稳定通过** |
+| 任务 1：非结构化地形运动控制、动态避障、路径规划 | 场地模型已完成；**自主探索已跑通**（explore 模式：前沿探索自动走遍场地并建图）；Gmapping + AMCL + DWA 导航基线已跑通（房间场景） |
+| 上下坡 / 狭窄通道 / 乱石越障 | 场景中已建模（坡 12°、S 弯弯宽 1.2 m、障碍空地五处碎石），机器人可自主通过上坡与 S 弯 |
 | 任务 2：生命目标识别与信息采集 | **尚未实现**（需要相机检测算法，后续方向） |
 | 隧道 1 识别后放弃、倒退决策、低姿态过管 | 尚未实现 |
 | Go2 机体、原生雷达、D435i 相机、弱光、动态障碍 | 尚未适配 |
 
-一句话总结：**场景和导航基线已经能跑，自主完赛能力和识别能力是下一步开发重点。** 详见 [比赛场地包说明](src/unitree_competition/README.md)。
+自主探索演示：
+
+```bash
+./run_competition.sh explore
+```
+
+机器人会自己从起点出发：上坡（L1）→ 转弯平台下坡 → S 弯（L2）→ 死胡同分岔 → 障碍空地（五处碎石）→ 管道区（L3），边探索边建图，无需遥控。按 L1→L3 的线性路线组织场地，对应比赛任务的递进难度。
 
 ## 环境要求
 
@@ -89,7 +95,7 @@ rosrun map_server map_saver -f src/unitree_competition/maps/competition
 
 | 目的 | 命令 |
 | --- | --- |
-| 启动比赛场景（建图 / 导航） | `./run_competition.sh mapping` / `./run_competition.sh navigation` |
+| 启动比赛场景（建图 / 导航 / **自主探索**） | `./run_competition.sh mapping` / `./run_competition.sh navigation` / `./run_competition.sh explore` |
 | 启动原房间演示 | `./run_demo.sh mapping` / `./run_demo.sh navigation` |
 | 后台启动（不显示窗口） | `python3 scripts/session.py start mapping --scene competition --headless --no-rviz` |
 | 查看 / 停止后台会话 | `python3 scripts/session.py status` / `python3 scripts/session.py stop` |

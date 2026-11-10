@@ -22,7 +22,7 @@ def start_time(pid):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("action", choices=["start", "stop", "status"])
-    parser.add_argument("mode", nargs="?", default="mapping", choices=["mapping", "navigation"])
+    parser.add_argument("mode", nargs="?", default="mapping", choices=["mapping", "navigation", "explore"])
     parser.add_argument("--headless", action="store_true")
     parser.add_argument("--no-rviz", action="store_true")
     parser.add_argument("--scene", choices=["room", "competition"], default="room")
