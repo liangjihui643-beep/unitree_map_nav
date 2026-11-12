@@ -5,6 +5,12 @@ arena:
   minimum: [-0.75, -0.75]
   wall_thickness: 0.12
   wall_height: 0.75
+# 物理引擎目标频率。高配机器保持默认(0.001/1000)；虚拟机/WSL 等算力不足
+# 的环境(gzserver CPU 打满、RTF 远低于 1、话题注册却无数据)改为 0.002/500，
+# 物理负载减半，Go1 步态不受影响。
+physics:
+  max_step_size: 0.001
+  real_time_update_rate: 1000
 spawn: [0.0, 0.0, 0.6, 1.5707963267948966]
 start: {center: [0.0, 0.0], size: [1.5, 1.5]}
 finish: {center: [10.1, 8.1], size: [2.0, 2.0]}

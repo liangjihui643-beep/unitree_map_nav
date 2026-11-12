@@ -103,8 +103,8 @@ def wedge(name, origin, length, width, h0, h1, yaw):
 for included in ('sun', 'ground_plane'):
     sub(sub(WORLD, 'include'), 'uri', 'model://' + included)
 physics = sub(WORLD, 'physics', name='default', type='ode')
-sub(physics, 'max_step_size', 0.001)
-sub(physics, 'real_time_update_rate', 1000)
+sub(physics, 'max_step_size', C['physics']['max_step_size'])
+sub(physics, 'real_time_update_rate', C['physics']['real_time_update_rate'])
 solver = sub(sub(physics, 'ode'), 'solver')
 sub(solver, 'type', 'quick')
 sub(solver, 'iters', 50)
