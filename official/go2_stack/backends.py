@@ -85,7 +85,7 @@ class UnitreeRLBackend:
         self.cmd_scale = np.asarray(cmd_scale, dtype=np.float32)
         self.default_angles = env._stand
         self.cmd = np.zeros(3, dtype=np.float32)
-        self.action = np.zeros(num_actions, dtype=np.float32)
+        self._action = np.zeros(num_actions, dtype=np.float32)
         self.obs = np.zeros(num_obs, dtype=np.float32)
         self._counter = 0
         self.policy_path = policy_path
@@ -125,7 +125,7 @@ class UnitreeRLBackend:
         o[6:9] = self.cmd * self.cmd_scale
         o[9:9 + 12] = qj
         o[21:33] = dqj
-        o[33:45] = self.action
+        o[33:45] = self._action
         o[45:47] = (math.sin(2 * math.pi * phase), math.cos(2 * math.pi * phase))
         if self._use_ort:
             out = self.session.run(None, {'obs': self.obs[None, :]})[0]
@@ -135,9 +135,9 @@ class UnitreeRLBackend:
             with torch.no_grad():
                 act = self.policy(torch.from_numpy(self.obs).unsqueeze(0)
                                   ).numpy().squeeze().astype(np.float32)
-        self.action = act
+        self._action = act
         return act * self.action_scale + self.default_angles
 
     def on_reset(self):
-        self.action = np.zeros(self.num_actions, dtype=np.float32)
+        self._action = np.zeros(self.num_actions, dtype=np.float32)
         self._counter = 0
