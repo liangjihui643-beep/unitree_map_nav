@@ -1,0 +1,4 @@
+go2.xml 与 assets/ 拷贝自 Unitree 官方仓库 unitree_mujoco（BSD-3-Clause，
+版权 (c) Unitree Robotics），对应上游 main 分支快照 2026-11-14。
+来源：https://github.com/unitreerobotics/unitree_mujoco
+许可证全文见 LICENSE-unitree_mujoco.txt

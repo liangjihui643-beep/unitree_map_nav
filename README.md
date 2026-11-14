@@ -146,6 +146,15 @@ unitree_map_nav/
 **想改场地尺寸？**
 改 `src/unitree_competition/config/arena.yaml` 后运行生成器并重启 Gazebo，见 [比赛场地包说明](src/unitree_competition/README.md#修改尺寸及重建)。
 
+## MuJoCo 训练环境（feat/mujoco-env 分支）
+
+比赛官方训练/评测链路为 **MuJoCo 3.17.0 + ONNX**（见赛题 PPT）。本仓库
+`feat/mujoco-env` 分支把同一份比赛场地配置搬进了 MuJoCo：Go2 官方模型
+（unitree_mujoco）、按 PPT 契约的传感器（前视 RGB 320×240@10Hz、72×9 线
+360° 激光@10Hz、IMU/编码器@50Hz）、出生点/碎石/足球生命体每回合随机化、
+ONNX 导出与 onnxruntime 1.31.1 本地验证脚本。Gazebo 分支继续做系统集成
+验证，两者共享 `arena.yaml` 几何真源。详见 [mujoco_env/README.md](mujoco_env/README.md)。
+
 ## 上游代码与许可证
 
 - 上游：[macc-n/ros_unitree](https://github.com/macc-n/ros_unitree)，固定版本 `0c7b48ade880fd9096d196123b3f9c98ea1131b3`（见 `config/environment.json`）。
