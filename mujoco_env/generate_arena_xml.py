@@ -32,7 +32,9 @@ ROCK_RGBA = '0.45 0.42 0.38 1'
 START_RGBA = '0.15 0.45 0.85 1'
 FINISH_RGBA = '0.15 0.65 0.35 1'
 PUDDLE_RGBA = '0.20 0.45 0.75 0.55'
-BALL_RGBA = '0.90 0.90 0.90 1'
+BALL_RGBA = '0.95 0.45 0.05 1'  # 安全橙：训练期识别占位色（评测以官方为准）
+# 生命体候选出现区（训练环境自定义，评测时官方随机）
+VICTIM_ZONES = [(7.2, 2.2), (6.4, 1.3), (8.6, 3.4), (7.4, 5.6), (9.9, 2.6)]
 
 
 def el(parent, tag, **attrs):
@@ -106,25 +108,29 @@ def build_arena(cfg, rng, with_victim=True):
         box(world, name + '_pad', (cx, cy, 0.002), (w / 2, h / 2, 0.002), rgba,
             visual_only=True)
 
-    # 坡道系统：上坡(+Y) -> 平台 -> 下坡(+X)，斜坡用绕 x 轴旋转的盒子
+    # 坡道系统：上坡(+Y) -> 平台 -> 下坡(+X)。
+    # 旋转盒建模：盒长轴沿局部 y（上坡）/ x（下坡），绕对应水平轴俯仰。
     s = cfg['slope']
     run = s['height'] / math.tan(math.radians(s['angle_deg']))
     ux, uy = s['uphill_start']
     dx, dy = s['downhill_start']
     width, high, turn_y = s['width'], s['height'], s['turn_y']
     ang = math.radians(s['angle_deg'])
-    box(world, 'uphill_ramp', (ux, uy + run / 2, high / 2 - 0.05),
-        (width / 2, run / 2 + 0.08, 0.25), RAMP_RGBA, euler=(-ang, 0, math.pi / 2))
+    embed = high / 2 - 0.25 * math.cos(ang) + 0.02   # 使坡面中点高度=high/2，低端吃进地面
+    box(world, 'uphill_ramp', (ux, uy + run / 2, embed),
+        (width / 2, run / 2 + 0.10, 0.25), RAMP_RGBA, euler=(ang, 0, 0))
     deck_len = turn_y + width / 2 - (uy + run)
     box(world, 'slope_deck', (ux, uy + run + deck_len / 2, high / 2),
         (width / 2, deck_len / 2, high / 2), TERRAIN_RGBA)
     box(world, 'cross_deck', ((ux + dx) / 2, turn_y, high / 2),
         ((dx - ux) / 2, width / 2, high / 2), TERRAIN_RGBA)
-    box(world, 'downhill_ramp', (dx + run / 2, dy, high / 2 - 0.05),
-        (run / 2 + 0.08, width / 2, 0.25), RAMP_RGBA, euler=(0, ang, 0))
-    # 坡面浅水洼（仅视觉，环境按 xy 判定"进水洼"）
-    box(world, 'puddle', (ux, uy + run * 0.55, 0.002), (width / 2 - 0.05, 0.30, 0.002),
-        PUDDLE_RGBA, euler=(-ang, 0, math.pi / 2), visual_only=True)
+    box(world, 'downhill_ramp', (dx + run / 2, dy, embed),
+        (run / 2 + 0.10, width / 2, 0.25), RAMP_RGBA, euler=(0, ang, 0))
+    # 坡面浅水洼（仅视觉，环境按 xy 判定"进水洼"）：贴在上坡面中前段
+    pud_y = uy + run * 0.55
+    pud_z = (run * 0.55) * math.tan(ang) + 0.006
+    box(world, 'puddle', (ux, pud_y, pud_z), (width / 2 - 0.05, 0.30, 0.004),
+        PUDDLE_RGBA, euler=(ang, 0, 0), visual_only=True)
 
     # 坡道护栏 + 起点东侧封挡（出发必须上坡）
     wall(world, 'rail_inner', (ux + width / 2 + t / 2, uy),
@@ -217,8 +223,7 @@ def build_arena(cfg, rng, with_victim=True):
 
     # 足球生命体（随机出现在可达区域，带物理可滚动）
     if with_victim:
-        zones = [(7.2, 2.2), (6.4, 1.3), (8.6, 3.4), (7.4, 5.6), (9.9, 2.6)]
-        bx, by = zones[rng.integers(0, len(zones))] if rng is not None else zones[0]
+        bx, by = VICTIM_ZONES[rng.integers(0, len(VICTIM_ZONES))] if rng is not None else VICTIM_ZONES[0]
         ball = el(world, 'body', name='victim_ball', pos='%.3f %.3f 0.115' % (bx, by))
         el(ball, 'freejoint', name='ball_joint')
         el(ball, 'geom', name='ball_geom', type='sphere', size='0.11',

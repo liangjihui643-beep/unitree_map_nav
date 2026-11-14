@@ -30,7 +30,7 @@ import yaml
 
 import mujoco
 
-from generate_arena_xml import ARENA_YAML, build_arena, merge_robot
+from generate_arena_xml import ARENA_YAML, VICTIM_ZONES, build_arena, merge_robot
 
 PKG = Path(__file__).resolve().parent
 ROBOT_XML = PKG / 'robot/go2/go2.xml'
@@ -114,9 +114,16 @@ class Go2ArenaEnv:
                 break
         assert self._base >= 0, '找不到基座 body（base_link/base/trunk）'
         self._base_qposadr = self.model.jnt_qposadr[self.model.body_jntadr[self._base]]
-        first_joint = self.model.body_jntadr[self._base] + self.model.body_jntnum[self._base]
-        self._jnt_qposadr = self.model.jnt_qposadr[first_joint]
-        self._jnt_dofadr = self.model.jnt_dofadr[first_joint]
+        # 关键：动作/关节名按"执行器顺序"，而 qpos/qvel 按"模型关节顺序"，
+        # 两者在 go2.xml 中不一致（如 FL 在 qpos 中最先）。必须用执行器->关节
+        # 的映射取地址，否则左右腿交叉配线：站立时因近似对称而不易察觉，
+        # 任何不对称指令都会让关节失控。
+        self._act_joints_cache = np.array(
+            [self.model.actuator_trnid[i, 0] for i in range(self.model.nu)])
+        self._act_qpos = np.array(
+            [self.model.jnt_qposadr[j] for j in self._act_joints_cache])
+        self._act_dof = np.array(
+            [self.model.jnt_dofadr[j] for j in self._act_joints_cache])
         self._stand = stand_pose(self.joint_names)
 
         self.renderer = None
@@ -149,17 +156,17 @@ class Go2ArenaEnv:
         self.data.qpos[b:b + 3] = (sx, sy, 0.445)
         # MuJoCo 四元数顺序为 wxyz
         self.data.qpos[b + 3:b + 7] = (math.cos(yaw / 2), 0.0, 0.0, math.sin(yaw / 2))
-        self.data.qpos[self._jnt_qposadr:self._jnt_qposadr + self.model.nu] = self._stand
+        self.data.qpos[self._act_qpos] = self._stand
         self.data.qvel[:] = 0
 
     def step(self, action):
         action = np.asarray(action, dtype=np.float64).reshape(-1)
         assert action.shape[0] == self.model.nu, '动作必须是 %d 维关节位置目标' % self.model.nu
-        target = np.clip(action, self.model.jnt_range[self._act_joints(), 0],
-                         self.model.jnt_range[self._act_joints(), 1])
+        target = np.clip(action, self.model.jnt_range[self._act_joints_cache, 0],
+                         self.model.jnt_range[self._act_joints_cache, 1])
         for _ in range(self.decimation):
-            q = self.data.qpos[self._jnt_qposadr:self._jnt_qposadr + self.model.nu]
-            dq = self.data.qvel[self._jnt_dofadr:self._jnt_dofadr + self.model.nu]
+            q = self.data.qpos[self._act_qpos]
+            dq = self.data.qvel[self._act_dof]
             torque = self.kp * (target - q) - self.kd * dq
             self.data.ctrl[:] = np.clip(torque, self.model.actuator_ctrlrange[:, 0],
                                         self.model.actuator_ctrlrange[:, 1])
@@ -171,12 +178,6 @@ class Go2ArenaEnv:
         terminated = self._fallen() or self._out_of_bounds()
         truncated = self._step_count >= self._max_steps()
         return obs, self._reward(), terminated, truncated, self._info()
-
-    def _act_joints(self):
-        if not hasattr(self, '_act_jnt_ids'):
-            self._act_jnt_ids = np.array(
-                [self.model.actuator_trnid[i, 0] for i in range(self.model.nu)])
-        return self._act_jnt_ids
 
     def _max_steps(self):
         return int(60.0 / self.ctrl_dt)
@@ -216,14 +217,12 @@ class Go2ArenaEnv:
 
     def _obs(self):
         pos, quat, gyro_b = self._base_state()
-        j0 = self._jnt_qposadr
-        jv = self._jnt_dofadr
         return {
             'base_quat': quat.astype(np.float32),          # wxyz
             'base_pos': pos.astype(np.float32),            # 训练辅助；PPT 说明无 GPS，评测勿依赖
             'gyro': gyro_b.astype(np.float32),             # 机体系角速度 rad/s @50Hz
-            'joint_pos': self.data.qpos[j0:j0 + self.model.nu].astype(np.float32),
-            'joint_vel': self.data.qvel[jv:jv + self.model.nu].astype(np.float32),
+            'joint_pos': self.data.qpos[self._act_qpos].astype(np.float32),
+            'joint_vel': self.data.qvel[self._act_dof].astype(np.float32),
             'lidar': self._lidar() if (self._step_count % self._lidar_every) == 0 else None,
             'rgb': self._rgb(),
         }
@@ -275,6 +274,38 @@ class Go2ArenaEnv:
             return None
         return float(np.linalg.norm(np.asarray(xy, dtype=np.float64)
                                     - self.data.xpos[ball][:2]))
+
+    def reset_soft(self, seed=None):
+        """不换布局的复位：只重摆机器人和足球，不重载模型。
+        供可视化 viewer 使用——launch_passive 持有的模型/数据对象不能更换。"""
+        if seed is not None:
+            self.rng = np.random.default_rng(seed)
+        mujoco.mj_resetData(self.model, self.data)
+        self._place_robot()
+        ball = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, 'victim_ball')
+        if ball >= 0:
+            adr = self.model.jnt_qposadr[self.model.body_jntadr[ball]]
+            bx, by = VICTIM_ZONES[self.rng.integers(0, len(VICTIM_ZONES))]
+            self.data.qpos[adr:adr + 3] = (bx, by, 0.115)
+            self.data.qpos[adr + 3:adr + 7] = (1.0, 0.0, 0.0, 0.0)
+        self.data.qvel[:] = 0.0
+        self._step_count = 0
+        mujoco.mj_forward(self.model, self.data)
+        return self._obs(), self._info()
+
+    def recover(self):
+        """跌倒后在原地重新站起（演示脚手架：非比赛合法动作，评测时不可用）。
+        保留当前 xy 与朝向，清空速度，恢复站立关节角。"""
+        pos, quat, _ = self._base_state()
+        yaw = math.atan2(2 * (quat[0] * quat[3] + quat[1] * quat[2]),
+                         1 - 2 * (quat[2] ** 2 + quat[3] ** 2))
+        b = self._base_qposadr
+        self.data.qpos[b:b + 3] = (pos[0], pos[1], 0.40)
+        self.data.qpos[b + 3:b + 7] = (math.cos(yaw / 2), 0, 0, math.sin(yaw / 2))
+        self.data.qpos[self._act_qpos] = self._stand
+        self.data.qvel[:] = 0.0
+        mujoco.mj_forward(self.model, self.data)
+        return self._obs(), self._info()
 
     def close(self):
         if self.renderer:
