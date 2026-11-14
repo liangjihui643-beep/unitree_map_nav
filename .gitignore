@@ -9,3 +9,11 @@
 /.catkin_workspace
 __pycache__/
 *.pyc
+
+# 官方训练包与第三方大仓库（README 附获取方式，不入库）
+/official/robotics-bench-go2-competition-training-resources/
+/third_party/
+/official/go2_stack/map_result.png
+/official/go2_stack/minimal_course_map.png
+/official/go2_stack/end_signal.json
+MUJOCO_LOG.TXT

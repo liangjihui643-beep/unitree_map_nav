@@ -155,6 +155,14 @@ unitree_map_nav/
 ONNX 导出与 onnxruntime 1.31.1 本地验证脚本。Gazebo 分支继续做系统集成
 验证，两者共享 `arena.yaml` 几何真源。详见 [mujoco_env/README.md](mujoco_env/README.md)。
 
+## 官方评测环境（feat/official-env 分支）
+
+比赛官方训练资源包（Go2 MuJoCo 物理权威 + 完整赛道 MJB + 足球目标）的最小完赛
+集成在该分支：`official/go2_stack/`（环境封装 / 可插拔行走后端 / 建图规划导航 /
+终点判定与结束信号），宇树开源训练框架（unitree_rl_gym / unitree_rl_mjlab）的
+接入说明见 [official/README.md](official/README.md)。评测固定版本
+MuJoCo 3.17.0 + onnx 1.23.2 + ONNX Runtime 1.31.1 + Python 3.12。
+
 ## 上游代码与许可证
 
 - 上游：[macc-n/ros_unitree](https://github.com/macc-n/ros_unitree)，固定版本 `0c7b48ade880fd9096d196123b3f9c98ea1131b3`（见 `config/environment.json`）。
