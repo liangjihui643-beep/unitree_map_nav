@@ -55,6 +55,7 @@ class KinematicModel:
         self.feet = {leg: self.model.body(f"{leg}_foot").id for leg in LEGS}
         self.position = np.array([0., 0., .30])
         self.velocity_world = np.zeros(3)
+        self.kinematic_velocity_world = np.zeros(3)
         self.forward_hint = None
         self.forward_hint_time = -np.inf
         self.last_time = None
@@ -102,6 +103,9 @@ class KinematicModel:
                 heights.append(.022 - r[2])
         if estimates:
             measured = np.median(estimates, axis=0)
+            # Independent observation; never feed scan-corrected controller
+            # velocity back into the same scan matcher's odometry prior.
+            self.kinematic_velocity_world = .7*self.kinematic_velocity_world+.3*np.clip(measured,-2.,2.)
             if self.forward_hint is not None and now-self.forward_hint_time < .25:
                 forward = self.R_z[:,0]
                 measured += .8*(self.forward_hint-measured@forward)*forward
@@ -295,6 +299,38 @@ class ConvexMPC:
             self.curb = CurbObservation(self.go2.position[:2], self.go2.R_z[:2, 0],
                                        self.ground_z(self.go2.position[:2]))
 
+    def observe_support(self, frame, visual_ground=None):
+        """Fill a missing near-body lidar plane using measured stance/IMU."""
+        from .stance_surface import StanceSurface
+        if not hasattr(self, "stance_surface"):
+            self.stance_surface = StanceSurface()
+        plane = self.stance_surface.update(frame)
+        if plane is None or self.curb is not None:
+            return
+        from .geometry import rot2
+        yaw = self.stance_surface_yaw = np.arctan2(self.go2.R_body_to_world[1,0], self.go2.R_body_to_world[0,0])
+        gradient = rot2(yaw) @ plane[:2]
+        # Reconstructed controller state, never simulator root state.
+        height = float(self.go2.position[2]+plane[2])
+        if np.linalg.norm(gradient) > np.tan(np.deg2rad(self.terrain_slope_limit_deg)):
+            return
+        slope = .75*self.terrain_plane[:2]+.25*gradient
+        previous = self.ground_z(self.go2.position[:2])
+        level = .75*previous+.25*height
+        self.terrain_plane = np.r_[slope, level-slope@self.go2.position[:2]]
+        self.terrain_updates += 1
+        if visual_ground is not None and len(visual_ground):
+            self.visual_ground_hits=np.asarray(visual_ground) @ self.go2.R_body_to_world.T+self.go2.position
+            self.visual_ground_stamp=frame.timestamp
+        if frame.timestamp-getattr(self,"visual_ground_stamp",-np.inf)<=1.:
+            contacts=frame.support_points @ self.go2.R_body_to_world.T + self.go2.position
+            hits=self.visual_ground_hits
+            near=(np.linalg.norm(hits[:,:2]-self.go2.position[:2],axis=1)<1.5)
+            measured=np.vstack([contacts,hits[near]])
+            samples=ground_surface(measured,level,.06,.6,self.terrain_slope_limit_deg)
+            if len(samples)>=4:
+                self.terrain_patch=GroundPatch(samples,.6,self.terrain_slope_limit_deg)
+
     def observe_terrain(self, body_points):
         """Estimate a near-body support plane from lidar only, without plant truth."""
         g = self.go2
@@ -428,6 +464,20 @@ class ConvexMPC:
                                                                self.forces[i], time).tau for i, leg in enumerate(LEGS)])
         return np.clip(canonical[self.actuator_columns], -self.limits, self.limits)
 
+    def measured_support_points(self):
+        """Reconstructed stance soles from sensed joints and IMU, in body FLU."""
+        g = self.go2
+        stance = self.active_gait.compute_current_mask(float(g.plant_data.time))[:, 0]
+        points = []
+        for leg, standing in zip(LEGS, stance):
+            if standing:
+                sole = g.get_single_foot_state_in_world(leg)[0] - g.position
+                sole[2] -= .022
+                points.append(g.R_world_to_body @ sole)
+        return np.asarray(points, dtype=float).reshape(-1, 3)
+
     def measured_velocity(self) -> Velocity:
-        body = self.go2.R_world_to_body @ self.go2.velocity_world
+        measured = self.go2.kinematic_velocity_world if getattr(self,"raw_odometry",False) else self.go2.velocity_world
+        basis=self.go2.R_z.T if getattr(self,"raw_odometry",False) else self.go2.R_world_to_body
+        body = basis @ measured
         return Velocity(float(body[0]), float(body[1]), float(self.go2.mjdata.qvel[5]))

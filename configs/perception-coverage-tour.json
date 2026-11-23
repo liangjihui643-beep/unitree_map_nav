@@ -1,0 +1,567 @@
+{
+  "schema": "go2-coverage-tour/1",
+  "frame": "map_start",
+  "scope": "Public-scene prior itinerary plus observed frontier completion; autonomous commands use sensors only; pipe bypass not competition traversal",
+  "assumed_start_xy": [
+    0.8,
+    0.8
+  ],
+  "assumed_start_yaw": 0.0,
+  "notes": [
+    "Coverage demonstration on the public original collision geometry.",
+    "Itinerary is manually authored, not inferred from simulator truth at runtime.",
+    "Pipe traversal and competition finish are not claimed.",
+    "Unobserved or occupied cells still block all waypoint commands.",
+    "Coverage transit points use 35cm tolerance; exact contest-pose checks remain in the original course route. All body/support/obstacle checks remain online."
+  ],
+  "terrain_slope_regions": [
+    {
+      "name": "L1_ascent_and_descent",
+      "bounds": [-0.5, 3.8, 3.3, 8.5],
+      "max_slope_deg": 20.0
+    }
+  ],
+  "stages": [
+    {
+      "name": "L1_ascent",
+      "waypoints": [
+        {
+          "xy": [
+            0.0,
+            0.8
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            0.35,
+            1.9
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            0.35,
+            2.7
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            0.35,
+            3.5
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            0.05,
+            3.6
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            -0.15,
+            4.4
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            -0.15,
+            5.3
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            -0.1,
+            6.1
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            0.05,
+            6.7
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        }
+      ]
+    },
+    {
+      "name": "L1_descent",
+      "waypoints": [
+        {
+          "xy": [
+            0.25,
+            7.5
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            0.8,
+            8.2
+          ],
+          "yaw": 0,
+          "tolerance": 0.35,
+          "gate_half_width": 0.6
+        },
+        {
+          "xy": [
+            1.55,
+            8.2
+          ],
+          "yaw": 0,
+          "tolerance": 0.35,
+          "gate_half_width": 0.6
+        },
+        {
+          "xy": [
+            2.4,
+            8.0
+          ],
+          "yaw": -0.2,
+          "tolerance": 0.35,
+          "gate_half_width": 0.6
+        },
+        {
+          "xy": [
+            3.45,
+            7.55
+          ],
+          "yaw": -0.4,
+          "tolerance": 0.35
+        }
+      ]
+    },
+    {
+      "name": "S_curve",
+      "waypoints": [
+        {
+          "xy": [
+            3.9,
+            7.35
+          ],
+          "yaw": -0.35,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            4.4,
+            7.0
+          ],
+          "yaw": -0.8,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            4.75,
+            6.4
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            4.5,
+            5.8
+          ],
+          "yaw": -2.0,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            4.55,
+            5.6
+          ],
+          "yaw": -2.5,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            3.95,
+            5.05
+          ],
+          "yaw": -2.5,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            3.75,
+            4.75
+          ],
+          "yaw": -2.1,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            3.55,
+            4.4
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.35
+        }
+      ]
+    },
+    {
+      "name": "dead_end",
+      "waypoints": [
+        {
+          "xy": [
+            3.55,
+            3.7
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            3.55,
+            3.2
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.25,
+          "inspect_front": true,
+          "hold_seconds": 1.0,
+          "strict": true
+        },
+        {
+          "xy": [
+            3.55,
+            4.0
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.14,
+          "reverse": true,
+          "strict": true
+        },
+        {
+          "xy": [
+            3.75,
+            4.75
+          ],
+          "yaw": -2.1,
+          "tolerance": 0.35,
+          "reverse": true,
+          "strict": true
+        },
+        {
+          "xy": [
+            3.95,
+            5.05
+          ],
+          "yaw": -2.5,
+          "tolerance": 0.35,
+          "reverse": true,
+          "strict": true
+        },
+        {
+          "xy": [
+            4.55,
+            5.35
+          ],
+          "yaw": -2.5,
+          "tolerance": 0.14,
+          "reverse": true,
+          "strict": true
+        },
+        {
+          "xy": [
+            4.55,
+            5.6
+          ],
+          "yaw": -2.5,
+          "reverse": true,
+          "strict": true,
+          "tolerance": 0.12
+        },
+        {
+          "xy": [
+            4.55,
+            5.6
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.35,
+          "yaw_tolerance": 0.06
+        }
+      ]
+    },
+    {
+      "name": "rubble",
+      "waypoints": [
+        {
+          "xy": [
+            4.55,
+            4.6
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.35,
+          "yaw_tolerance": 0.06,
+          "narrow_passage": true
+        },
+        {
+          "xy": [
+            4.55,
+            4.0
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.35,
+          "narrow_passage": true,
+          "yaw_tolerance": 0.06
+        },
+        {
+          "xy": [
+            5.25,
+            3.0
+          ],
+          "yaw": -1.5707963267948966,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            5.25,
+            1.85
+          ],
+          "yaw": 0,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            6.25,
+            1.85
+          ],
+          "yaw": 0,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            7.35,
+            1.85
+          ],
+          "yaw": 0,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            8.3,
+            2.4
+          ],
+          "yaw": 0.5,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            9.0,
+            3.2
+          ],
+          "yaw": 0.8,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            9.0,
+            4.3
+          ],
+          "yaw": 3.141592653589793,
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            7.3,
+            4.3
+          ],
+          "yaw": 1.5707963267948966,
+          "tolerance": 0.35
+        }
+      ]
+    },
+    {
+      "name": "pipe_external_bypass",
+      "waypoints": [
+        {
+          "xy": [
+            7.3,
+            4.3
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            9.4,
+            4.3
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            10.9,
+            4.3
+          ],
+          "tolerance": 0.35,
+          "yaw": 1.5708
+        },
+        {
+          "xy": [
+            10.9,
+            5.42
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            10.9,
+            6.8
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            10.2,
+            7.1
+          ],
+          "tolerance": 0.35
+        }
+      ]
+    },
+    {
+      "name": "north_sector",
+      "waypoints": [
+        {
+          "xy": [
+            9.45,
+            7.4
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            9.4,
+            7.8
+          ],
+          "tolerance": 0.25,
+          "hold_seconds": 1.0,
+          "strict": true,
+          "survey_observation_s": 3.0,
+          "yaw_tolerance": 0.14,
+          "yaw": 0.38
+        },
+        {
+          "xy": [
+            9.8,
+            8.55
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            9.2,
+            8.5
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            10.9,
+            6.8
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            10.9,
+            4.3
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            7.3,
+            4.3
+          ],
+          "tolerance": 0.35
+        }
+      ]
+    },
+    {
+      "name": "rubble_views",
+      "waypoints": [
+        {
+          "xy": [
+            7.3,
+            3.5
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            6.2,
+            2.9
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            7.4,
+            2.0
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            8.8,
+            1.2
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            10.3,
+            0.4
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            8.0,
+            0.3
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            5.8,
+            0.3
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            5.8,
+            1.7
+          ],
+          "tolerance": 0.35
+        },
+        {
+          "xy": [
+            4.9,
+            2.8
+          ],
+          "tolerance": 0.35
+        }
+      ]
+    }
+  ]
+}

@@ -28,7 +28,8 @@ class OrderedCourse:
             path = Path(__file__).resolve().parents[2] / path
         self.definition = json.loads(path.read_text())
         self.stages = self.definition.get("stages", [])
-        if self.definition.get("frame") != "map_start" or [s.get("name") for s in self.stages] != STAGES:
+        self.coverage_tour = self.definition.get("schema") == "go2-coverage-tour/1"
+        if self.definition.get("frame") != "map_start" or (not self.coverage_tour and [s.get("name") for s in self.stages] != STAGES):
             raise ValueError("Ordered course requires map_start and the complete mandatory stage order")
         for stage in self.stages:
             if not stage.get("waypoints"):
@@ -83,6 +84,8 @@ class OrderedCourse:
         return np.linalg.norm(self.target-pose.xy()) <= self.waypoint.get("tolerance", .20)+margin
 
     def evidence(self):
+        if self.coverage_tour:
+            return True
         if self.start_height is None:
             return False
         if self.stage == "L1_ascent":

@@ -26,6 +26,8 @@ class Recorder:
         frame.validate()
         name = f"frame_{self.index:06d}.npz"
         arrays = {"points": frame.points, "quaternion": frame.quaternion}
+        if frame.support_points is not None:
+            arrays["support_points"] = frame.support_points
         if frame.image is not None:
             arrays["image"] = frame.image
         if frame.point_times is not None:
@@ -56,7 +58,8 @@ def replay(directory):
                               Velocity(**record["velocity"]),
                               data["image"] if "image" in data else None,
                               data["point_times"] if "point_times" in data else None,
-                              record.get("state_age", 0.), record.get("image_age", 0.))
+                              record.get("state_age", 0.), record.get("image_age", 0.),
+                              data["support_points"] if "support_points" in data else None)
             frame.validate()
             yield frame
 

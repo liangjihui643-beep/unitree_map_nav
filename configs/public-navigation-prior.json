@@ -1,0 +1,8 @@
+{
+  "source": "offline public scene geometry; NOT measured map",
+  "scene_sha256": "2dd875d238040d9a8616869cb2e30d00abf131b48b89b011af6dc10bd264089c",
+  "coordinate_frame": "map_start; declared start world(.8,.8), yaw0",
+  "floor_cells": 40949,
+  "rock_cells": 2400,
+  "reference_points": 4877
+}

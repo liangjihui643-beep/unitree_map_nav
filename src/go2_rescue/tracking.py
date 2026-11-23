@@ -25,11 +25,13 @@ class Track:
     update_time: float = 0.0
     confirming_hits: int = 0
     last_confirming: float = -np.inf
+    observation: BallObservation | None = None
 
 
 class Tracker:
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, static_targets=False):
         self.c = config
+        self.static_targets = static_targets
         self.tracks: list[Track] = []
         self.next_id = 1
         self.reported_positions: list[np.ndarray] = []
@@ -39,6 +41,8 @@ class Tracker:
         self.tracks = [t for t in self.tracks if timestamp - t.last_seen < (30. if t.reported else 3.)]
         for track in self.tracks:
             dt = max(0., timestamp - track.update_time)
+            if self.static_targets:
+                track.velocity[:] = 0.
             track.position = track.position + track.velocity * dt
             track.variance = min(4., track.variance + .015 * dt)
             track.update_time = timestamp
@@ -58,7 +62,10 @@ class Tracker:
                 track.position = track.position + gain * innovation
                 track.velocity = .7 * track.velocity + .3 * np.clip(innovation / dt, -.5, .5)
                 track.variance = max(.003, (1 - gain) * track.variance)
+                if self.static_targets:
+                    track.velocity[:] = 0.
                 track.last_seen, track.hits = timestamp, track.hits + 1
+                track.observation = detection
                 track.confidence = .5 * (track.confidence + detection.confidence)
                 track.diverse_view |= np.linalg.norm(pose.xy() - track.viewpoint) > .12
                 if detection.confidence >= .8:
@@ -70,7 +77,8 @@ class Tracker:
             self.tracks.append(Track(self.next_id, detection.position.copy(), np.zeros(2), detection.sigma ** 2,
                                      timestamp, timestamp, pose.xy().copy(), confidence=detection.confidence,
                                      update_time=timestamp, confirming_hits=int(detection.confidence >= .8),
-                                     last_confirming=timestamp if detection.confidence >= .8 else -np.inf))
+                                     last_confirming=timestamp if detection.confidence >= .8 else -np.inf,
+                                     observation=detection))
             self.next_id += 1
         events = []
         for track in self.tracks:

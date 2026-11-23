@@ -25,6 +25,13 @@ def step_record(step, timestamp, duration):
 
 def save_map(autonomy: Autonomy, output: Path):
     autonomy.grid.save(output / "map.npz")
+    summary = autonomy.grid.evidence_summary()
+    if summary:
+        (output / "map_evidence.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
+    if getattr(autonomy.grid, "wall_diagnostics", None):
+        with (output / "map_wall_diagnostics.jsonl").open("w", encoding="utf-8") as stream:
+            for item in autonomy.grid.wall_diagnostics:
+                stream.write(json.dumps(item) + "\n")
     grid = autonomy.grid
     canvas = np.full((*grid.seen.shape, 3), 125, np.uint8)
     canvas[grid.seen] = (225, 225, 225)
@@ -131,7 +138,7 @@ def main():
     sim.add_argument("--spawn", type=float, nargs=2, default=[.8, .8], metavar=("X", "Y"),
                      help="Initial reset XY; default 0.8 0.8 before the ramp route. Other locations are labelled stage tests")
     sim.add_argument("--spawn-yaw", type=float, default=0., help="Initial heading in radians; scene reset only")
-    sim.add_argument("--control", choices=["autonomy", "smoke", "ramp-smoke", "speed-smoke"], default="autonomy")
+    sim.add_argument("--control", choices=["autonomy", "smoke", "ramp-smoke", "speed-smoke", "perception-walk", "perception-survey"], default="autonomy")
     sim.add_argument("--max-speed", type=float, help="Forward speed limit in m/s for ordinary walking and narrow passages; overrides config")
     sim.add_argument("--max-reverse-speed", type=float, help="Independent reverse limit in m/s; simulation default .25, overrides config")
     sim.add_argument("--course-policy", choices=["auto", "ordered", "explore"], default="auto",
@@ -140,7 +147,7 @@ def main():
     sim.add_argument("--task-fixture", action="store_true", help="Local football/finish scene; entry-ramp variant by default, --pipe-ramp official preserves source geometry")
     sim.add_argument("--pipe-ramp", choices=["official", "entry"],
                      help="Task fixture ramp layout: entry(default with --task-fixture) moves the exit ramp to the west entrance; official preserves source geometry")
-    sim.add_argument("--task-layout", choices=["finish-area", "near-start"], default="finish-area",
+    sim.add_argument("--task-layout", choices=["finish-area", "near-start", "perception"], default="finish-area",
                      help="Place the task in the far finish area (default); near-start is the old short regression fixture")
     sim.add_argument("--viewer", action="store_true", help="Open MuJoCo interactive viewer")
     sim.add_argument("--hide-camera", action="store_true", help="Hide the default live front-camera inset in the viewer")
@@ -148,9 +155,42 @@ def main():
     sim.add_argument("--realtime", action="store_true")
     sim.add_argument("--record", action="store_true", help="Opt in to raw sensor recording (off by default)")
     sim.add_argument("--video", action="store_true", help="Opt in to offscreen video encoding (off by default)")
+    sim.add_argument("--video-fps", type=float, default=10., help="Recorded overview frames per simulation second (1..30); sensors unchanged")
     sim.add_argument("--save-physics", action="store_true", help="Opt in to sampled physics.npz diagnostics")
     sim.add_argument("--snapshots", action="store_true", help="Opt in to map/image snapshots")
+    sim.add_argument("--low-obstacle", action="store_true",
+                     help="Bypass observation: run the RGB low-obstacle model on live frames; never fed to the planner")
+    sim.add_argument("--low-obstacle-model", default=None, help="Path to the low-obstacle ONNX (default models/seg_low_obstacle_v8.onnx; perception demo uses v10)")
+    sim.add_argument("--low-obstacle-every", type=float, default=.5, help="Seconds between low-obstacle inferences")
+    sim.add_argument("--camera-every", type=int, default=1,
+                     help="Render the front camera every N-th nav step (1=10Hz); decoding/ball roles assume 1")
+    sim.add_argument("--camera-size", type=int, nargs=2, default=None, metavar=("W", "H"),
+                     help="Profiling override for the render resolution; scales nothing, so geometry roles must keep 320x240")
+    sim.add_argument("--ros2", action="store_true",
+                     help="Transport observations/commands over the ROS 2 bridge; commands come from an external agent (go2-rescue ros2-agent)")
+    sim.add_argument("--ros2-sim-port", type=int, default=8765, help="Bridge port the simulator connects to")
     sim.add_argument("--viewer-fps", type=float, default=60., help="Maximum viewer sync rate, independent of sensor/video frequency")
+    sim.add_argument("--coverage", action="store_true", help="Autonomous observed-floor coverage with joint/IMU/RGB support; no truth navigation")
+    sim.add_argument("--known-route-diagnostic", action="store_true", help="Diagnostic only: follow public route using simulator pose; never autonomous acceptance")
+    sim.add_argument("--planned-survey", action="store_true", help="Public-map survey route with estimated sensor pose; avoids known rocks; no frontier exploration")
+    sim.add_argument("--survey-segment", type=int, nargs=2, metavar=("FIRST", "STOP"),
+                     help="Local planned-survey test, with a known initial pose; stop index is exclusive")
+    sim.add_argument("--hybrid-ball", action="store_true", help="Combine the flat-floor hypothesis and silhouette multi-view rescue (requires --slope-perception)")
+    sim.add_argument("--outline-ball", action="store_true", help="Test silhouette refinement and 2-D tracks (requires --slope-perception)")
+    sim.add_argument("--slope-perception", action="store_true", help="Experimental slope-aware visual and range-only outputs (requires --perception-demo and navigation support)")
+    rubble = sim.add_mutually_exclusive_group()
+    rubble.add_argument("--dense-rubble", action="store_true", help="Include repeated RGB stereo estimates in terrain_layer.json (requires --slope-perception)")
+    rubble.add_argument("--multiview-rubble", action="store_true", help="Use joint keyframe depths and local ground support for the rubble layer (requires --slope-perception)")
+    sim.add_argument("--rubble-precision-model", type=Path,
+                     help="Add RGB consensus and inferred relief candidates (requires --multiview-rubble)")
+    sim.add_argument("--rubble-single-view", type=Path,
+                     help="Publish single RGB frame range-layer rubble candidates and a comparison baseline")
+    sim.add_argument("--rubble-completion-model", type=Path,
+                     help="Estimate a revisable rubble footprint for planning (requires --perception-demo)")
+    sim.add_argument("--rubble-region-mapping", action="store_true",
+                     help="Track and replace rubble surface contributions (requires --rubble-completion-model)")
+    sim.add_argument("--perception-demo", action="store_true", help="Build and record perception layers in a moving MPC diagnostic")
+    sim.add_argument("--baseline-localizer", action="store_true", help="Use the original ICP window in the perception diagnostic")
     sim.add_argument("--seed", type=int, default=0)
     for name in ("demo", "replay", "live", "native"):
         p = sub.add_parser(name)
@@ -169,6 +209,12 @@ def main():
         if name == "native":
             p.add_argument("--lidar-provider", required=True, help="module:factory implementing the actual scanner driver")
             p.add_argument("--sport-velocity-frame", required=True, choices=["body", "imu_world"])
+    agent = sub.add_parser("ros2-agent")
+    agent.add_argument("--config")
+    agent.add_argument("--output", default="output/ros2_agent")
+    agent.add_argument("--seconds", type=float, default=20.)
+    agent.add_argument("--rate", type=float, default=20.)
+    agent.add_argument("--ros2-agent-port", type=int, default=8766)
     args = parser.parse_args()
     if args.mode == "mujoco":
         import os
@@ -179,6 +225,12 @@ def main():
             run_simulation(args)
         except (ValueError, OSError, RuntimeError) as error:
             parser.exit(1, f"go2-rescue mujoco: {error}\n")
+    elif args.mode == "ros2-agent":
+        from .ros2_agent import run_agent
+        try:
+            run_agent(args.config, args.output, args.seconds, args.rate, args.ros2_agent_port)
+        except (ValueError, OSError, ImportError, RuntimeError) as error:
+            parser.exit(1, f"go2-rescue ros2-agent: {error}\n")
     elif args.mode == "init-config":
         if Path(args.path).exists():
             parser.error("Config already exists")

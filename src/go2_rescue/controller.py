@@ -28,6 +28,18 @@ class Autonomy:
             config.validate()
         self.localization = Localization(config)
         self.grid = GridMap(config)
+        self.known_map_navigator = None
+        if config.navigation_prior:
+            from .known_map_navigation import KnownMapNavigator
+            self.known_map_navigator = KnownMapNavigator(config)
+        self.navigation_support = None
+        if config.navigation_support:
+            from pathlib import Path
+            from .navigation_support import NavigationSupport
+            from .low_obstacle import LowObstacleDetector
+            model = Path(__file__).resolve().parents[2] / "models/navigation_floor.onnx"
+            self.navigation_support = NavigationSupport(config, LowObstacleDetector(
+                model, config.camera_matrix, config.body_from_camera, config.base_height))
         self.corridor_global_grid = None
         self.corridor_keyframe_start = None
         self.perception = Perception(config)
@@ -52,6 +64,10 @@ class Autonomy:
         self.current_path = np.empty((0, 2))
         self.water = WaterDetector(config)
         self.hazard_observations = []
+        # RGB-only keep-out regions are provisional. Repeated camera frames
+        # from one stance are not independent evidence and must not become a
+        # permanent hard obstacle through add_hazard()'s vote accumulator.
+        self.rgb_hazard_candidates = []
         self.scan_start = None
         self.scan_yaw = None
         self.scan_angle = 0.
@@ -61,6 +77,10 @@ class Autonomy:
         self.slow_since = None
         self.recovery_path = np.empty((0, 3))
         self.recovery_index = 0
+        self.ordered_probe_goal = None
+        self.ordered_probe_attempt = -np.inf
+        self.ordered_no_path_since = None
+        self.coverage_exploring = False
         self.margin_escape_active = False
         self.escape_dwa = DWA(replace(config, safety_margin=0., max_vx=min(config.max_vx, .05),
                                      max_reverse_vx=min(config.max_reverse_vx, .05),
@@ -72,6 +92,34 @@ class Autonomy:
                                       max_vx=min(config.max_vx, config.passage_max_vx), max_vy=min(config.max_vy, .05),
                                       max_wz=min(config.max_wz, .15)))
 
+    def _confirm_rgb_hazard(self, polygon, pose):
+        """Require a second spatially distinct view before hard-blocking RGB-only cues."""
+        center = np.asarray(polygon, dtype=float).mean(axis=0)
+        position = pose.xy().copy()
+        yaw = float(pose.yaw)
+        cluster = None
+        for item in self.rgb_hazard_candidates:
+            if np.linalg.norm(item["center"] - center) <= .40:
+                cluster = item
+                break
+        if cluster is None:
+            self.rgb_hazard_candidates.append({
+                "center": center, "views": [(position, yaw)], "confirmed": False})
+            self.rgb_hazard_candidates = self.rgb_hazard_candidates[-100:]
+            return False
+        if cluster["confirmed"]:
+            return False
+        independent = any(
+            np.linalg.norm(position - old_position) >= .25
+            or abs(wrap(yaw - old_yaw)) >= np.deg2rad(25.)
+            for old_position, old_yaw in cluster["views"])
+        if not independent:
+            return False
+        cluster["views"].append((position, yaw))
+        cluster["center"] = .5 * cluster["center"] + .5 * center
+        cluster["confirmed"] = True
+        return True
+
     def step(self, frame: Frame) -> Step:
         result = self._step(frame)
         result.diagnostics = {"goal": None if self.goal is None else self.goal.tolist(),
@@ -79,9 +127,15 @@ class Autonomy:
                               "path_cells": len(self.current_path),
                               "ground_height": self.grid.ground_height,
                               "hazard_cells": int((self.grid.hazard_votes >= 2).sum()),
-                              "reported_targets": len(self.tracker.reported_positions)}
+                              "reported_targets": len(self.tracker.reported_positions),
+                              "registration": self.localization.last_registration,
+                              "support": self.navigation_support.status if self.navigation_support else None,
+                              "hazard_sources": getattr(self.water,"last_sources",[])}
         if self.course is not None:
             result.diagnostics["course"] = self.course.diagnostics()
+            result.diagnostics["coverage_frontier_mode"] = self.coverage_exploring
+        if self.known_map_navigator is not None:
+            result.diagnostics["survey_route"] = self.known_map_navigator.status
         return result
 
     def ordered_step(self, frame, pose, points, events, dt):
@@ -163,11 +217,78 @@ class Autonomy:
                     return Step(Velocity(), pose, "recovering", events, "ordered_plan_pose_alignment")
             return Step(command, pose, self.state, events, "ordered_align_checkpoint")
         self.current_path = course.local_path(self.grid, pose)
+        # Intermediate goals returned by local_path are safe, but the best
+        # cell can move left/right as sparse evidence changes. Hold that goal
+        # until reached (or invalidated) instead of dithering between cells.
+        direct_route = (len(self.current_path) > 0 and
+                        np.linalg.norm(self.current_path[-1]-target) < .12)
+        if direct_route:
+            self.ordered_probe_goal = None
+        else:
+            if self.ordered_probe_goal is not None:
+                distance = np.linalg.norm(self.ordered_probe_goal-pose.xy())
+                if distance < .18:
+                    self.explorer.arrived(self.grid,self.ordered_probe_goal,frame.timestamp)
+                    self.ordered_probe_goal = None
+                elif frame.timestamp-self.ordered_probe_attempt > 15.:
+                    self.explorer.reject(self.grid,self.ordered_probe_goal,frame.timestamp)
+                    self.ordered_probe_goal = None
+            if self.ordered_probe_goal is None:
+                if len(self.current_path):
+                    self.ordered_probe_goal=self.current_path[-1].copy()
+                    self.ordered_probe_attempt=frame.timestamp
+                elif frame.timestamp-self.ordered_probe_attempt >= 8.:
+                    self.ordered_probe_attempt=frame.timestamp
+                    candidate=self.explorer.choose(self.grid,pose,frame.timestamp,toward=target)
+                    if candidate is not None and np.linalg.norm(candidate-pose.xy()) > .24:
+                        self.ordered_probe_goal=np.asarray(candidate,dtype=float).copy()
+                        events.append(Event("ordered_frontier_probe",frame.timestamp,{
+                            "goal_xy":self.ordered_probe_goal.tolist(),
+                            "checkpoint_xy":target.tolist(),
+                            "unknown_and_hazard_cells_remain_blocked":True}))
+            if self.ordered_probe_goal is not None:
+                path=astar(self.grid.traversable(),self.grid.cell(pose.xy()),
+                           self.grid.cell(self.ordered_probe_goal))
+                if path:
+                    self.current_path=np.array([self.grid.world(cell) for cell in path])
+                    self.goal=self.ordered_probe_goal.copy()
+                    command=planner.command(pose,frame.velocity,self.current_path,
+                        self.grid.obstacle_points(points,pose),self.grid,dt,reverse_limit=.08)
+                    if np.linalg.norm(command.array())>1e-6:
+                        return Step(command,pose,"ordered_frontier_probe",events,
+                                    "ordered_safe_frontier_probe")
+                    return Step(Velocity(),pose,"ordered_frontier_probe",events,
+                                "ordered_frontier_probe_wait")
+                self.explorer.reject(self.grid,self.ordered_probe_goal,frame.timestamp)
+                self.ordered_probe_goal=None
         if not len(self.current_path):
             self.goal = target.copy()
+            if course.coverage_tour and frame.timestamp-self.started > 20.:
+                self.ordered_no_path_since = (frame.timestamp if self.ordered_no_path_since is None
+                                              else self.ordered_no_path_since)
+                if frame.timestamp-self.ordered_no_path_since >= 8.:
+                    self.coverage_exploring = True
+                    self.state = "exploring"
+                    events.append(Event("coverage_route_deferred",frame.timestamp,{
+                        "stage":course.stage,"waypoint_index":course.waypoint_index,
+                        "checkpoint_xy":target.tolist(),
+                        "reason":"no safe observed route for 8s",
+                        "unknown_occupied_and_hazard_cells_remain_blocked":True,
+                        "course_checkpoint_remains_unverified":True}))
+                    return Step(Velocity(),pose,self.state,events,"coverage_switch_to_safe_frontiers")
+            if self.navigation_support is not None and not course.waypoint.get("reverse"):
+                # A fixed forward camera must first face an unobserved route.
+                # Rotation still passes the full measured body/hazard check.
+                direction = target-pose.xy()
+                error = wrap(np.arctan2(direction[1],direction[0])-pose.yaw)
+                if abs(error) > .15:
+                    look = planner.safe_turn(pose,float(np.clip(error,-.25,.25)),self.grid)
+                    if abs(look.wz) > .01:
+                        return Step(look,pose,"scanning",events,"ordered_observe_route_heading")
             if frame.timestamp-self.last_progress > 5. and self.begin_recovery(pose, frame.timestamp):
                 return Step(Velocity(), pose, "recovering", events, "ordered_plan_recovery")
             return Step(Velocity(), pose, self.state, events, "ordered_no_observed_route")
+        self.ordered_no_path_since = None
         self.goal = self.current_path[-1].copy()
         heading = desired if strict_heading or np.linalg.norm(target-pose.xy()) < .45 else None
         planning_velocity = frame.velocity
@@ -238,7 +359,14 @@ class Autonomy:
         if frame.state_age > self.c.max_sensor_age:
             return Step(Velocity(), self.localization.pose, self.state, [], "stale_state")
         previous_time = self.last_timestamp
+        if self.navigation_support is not None:
+            self.navigation_support.observe(frame)
+            self.localization.support_plane=self.navigation_support.surface.plane
+            self.localization.visual_prior=self.navigation_support.visual_prior(frame)
+            self.localization.ground_filter=lambda points:self.navigation_support.classify_ground(points,frame,points_frame="gravity")
         pose, points = self.localization.update(frame)
+        if self.navigation_support is not None:
+            self.navigation_support.accept_pose(frame,pose)
         self.last_timestamp = frame.timestamp
         dt = .1 if previous_time is None else frame.timestamp - previous_time
         if self.state in {"finished", "timed_out"}:
@@ -250,8 +378,17 @@ class Autonomy:
         if max(abs(roll), abs(pitch)) > np.deg2rad(25):
             return Step(Velocity(), pose, self.state, [], "excessive_tilt")
         if pose.quality < self.c.min_pose_quality:
+            if self.known_map_navigator is not None:
+                plane = self.navigation_support.surface.plane if self.navigation_support is not None else None
+                command = self.known_map_navigator.reacquire(frame,self.localization.sensor_heading,points,plane)
+                if command is not None and abs(command.wz) > .01:
+                    return Step(command,pose,self.state,[],"stationary_localization_scan")
             return Step(Velocity(), pose, self.state, [], "localization_unreliable")
         if self.localization.corrections:
+            # Candidate centroids are in the old map frame. Drop unconfirmed
+            # RGB evidence after a map correction; confirmed hazards are
+            # already retained in hazard_observations and transformed below.
+            self.rgb_hazard_candidates.clear()
             corrected_hazards = []
             for polygon in self.hazard_observations:
                 center = polygon.mean(axis=0)
@@ -260,8 +397,11 @@ class Autonomy:
             self.hazard_observations = corrected_hazards
             self.grid.clear()
             keys = self.localization.keyframes if self.corridor_keyframe_start is None else self.localization.keyframes[self.corridor_keyframe_start:]
-            for key in keys:
-                self.grid.update(key.points, key.pose)
+            if self.navigation_support is not None:
+                self.navigation_support.rebuild(self.grid,keys,self.localization.corrections)
+            else:
+                for key in keys:
+                    self.grid.update(key.points, key.pose, getattr(key, "quaternion", None), getattr(key, "timestamp", None))
             for polygon in self.hazard_observations:
                 self.grid.add_hazard(polygon)
             self.tracker.correct_map(self.localization.corrections)
@@ -279,7 +419,15 @@ class Autonomy:
             self.slow_since = self.scan_start = None
             if self.state in {"recovering", "verifying"}:
                 self.state = "exploring"
-        self.grid.update(points, pose)
+        if self.navigation_support is not None:
+            self.navigation_support.prepare(frame,pose,self.grid)
+            self.grid.visual_ground_mask = self.navigation_support.classify_ground(
+                points, frame, points_frame="gravity", allow_ramp=self.c.map_connected_ramp_ground)
+        self.grid.update(points, pose, frame.quaternion, frame.timestamp)
+        if self.navigation_support is not None:
+            self.navigation_support.update(frame, pose, self.grid)
+            if self.localization.keyframes:
+                self.navigation_support.capture_keyframe(self.localization.keyframes[-1],frame,self.grid)
         self.explorer.observe(pose, frame.timestamp)
         events = []
         if self.started is None:
@@ -294,7 +442,7 @@ class Autonomy:
             self.state = "timed_out"
             events.append(Event("timeout", frame.timestamp))
             return Step(Velocity(), pose, self.state, events, "budget_exhausted_without_finish")
-        if self.course is not None:
+        if self.course is not None and self.known_map_navigator is None:
             if self.course.waypoint.get("observed_corridor") and self.corridor_keyframe_start is None:
                 # A height map accumulated across ascent/descent carries a
                 # drifting vertical reference. Start a measured local terrain
@@ -303,7 +451,7 @@ class Autonomy:
                 self.corridor_global_grid = self.grid
                 self.corridor_keyframe_start = max(0,len(self.localization.keyframes)-1)
                 self.grid = GridMap(self.c)
-                self.grid.update(points,pose)
+                self.grid.update(points, pose, frame.quaternion, frame.timestamp)
                 for polygon in self.hazard_observations:
                     self.grid.add_hazard(polygon)
                 events.append(Event("corridor_terrain_submap_started",frame.timestamp,{
@@ -323,10 +471,13 @@ class Autonomy:
                 # Fine cells are needed at the flat portal, whereas the ramp's
                 # sparse ground returns benefit from the coarser terrain grid.
                 self.grid = GridMap(self.c)
-                for key in self.localization.keyframes:
-                    self.grid.update(key.points, key.pose)
-                    key.scan = self.localization.structural_scan(key.points, key.pose)
-                self.grid.update(points, pose)
+                if self.navigation_support is not None:
+                    self.navigation_support.rebuild(self.grid,self.localization.keyframes)
+                else:
+                    for key in self.localization.keyframes:
+                        self.grid.update(key.points, key.pose, getattr(key, "quaternion", None), getattr(key, "timestamp", None))
+                        key.scan=self.localization.structural_scan(key.points,key.pose)
+                self.grid.update(points, pose, frame.quaternion, frame.timestamp)
                 for polygon in self.hazard_observations:
                     self.grid.add_hazard(polygon)
                 self.recovery_path, self.recovery_index = np.empty((0, 3)), 0
@@ -338,7 +489,13 @@ class Autonomy:
         detections = []
         if frame.image is not None and frame.image_age <= self.c.max_sensor_age:
             image = self.perception.undistort(frame.image)
-            for polygon in self.water.detect(image, frame, pose, self.grid):
+            polygons = self.water.detect(image, frame, pose, self.grid)
+            sources = getattr(self.water, "last_sources", [])
+            for index, polygon in enumerate(polygons):
+                source = sources[index] if index < len(sources) else "confirmed_sensor_hazard"
+                if source == "rgb_stance_keepout_candidate":
+                    if not self._confirm_rgb_hazard(polygon, pose):
+                        continue
                 self.grid.add_hazard(polygon)
                 self.hazard_observations.append(polygon)
             self.hazard_observations = self.hazard_observations[-200:]
@@ -359,12 +516,20 @@ class Autonomy:
         if np.linalg.norm(pose.xy() - self.progress_position) > .12 or abs(wrap(pose.yaw - self.progress_yaw)) > .25:
             self.progress_position, self.last_progress = pose.xy().copy(), frame.timestamp
             self.progress_yaw = pose.yaw
-        if self.course is not None and not self.course.route_complete:
+        if self.known_map_navigator is not None:
+            self.known_map_navigator.sync_hazards(self.grid)
+            result = self.known_map_navigator.step(frame,pose,points,events,dt,
+                self.navigation_support.surface.plane if self.navigation_support else None)
+            self.goal=self.known_map_navigator.goal
+            self.current_path=self.known_map_navigator.path
+            self.state=result.state
+            return result
+        if self.course is not None and not self.course.route_complete and not self.coverage_exploring:
             return self.ordered_step(frame, pose, points, events, dt)
         quota_met = self.c.target_quota > 0 and len(self.tracker.reported_positions) >= self.c.target_quota
         returning = elapsed >= self.c.mission_seconds - self.c.return_reserve or quota_met
         finish_reachable = self.finish_goal is not None and bool(astar(self.grid.traversable(), self.grid.cell(pose.xy()), self.grid.cell(self.finish_goal)))
-        if self.course is not None and not quota_met:
+        if self.course is not None and not self.course.coverage_tour and not quota_met:
             # Mandatory traversal is finished; search here rather than restarting
             # global exploration or declaring finish without the required target.
             self.state = "ordered_search"
@@ -429,7 +594,13 @@ class Autonomy:
             elif self.goal is None or np.linalg.norm(self.goal - pose.xy()) < .18:
                 if self.goal is not None:
                     self.explorer.arrived(self.grid, self.goal, frame.timestamp)
-                self.goal = self.explorer.choose(self.grid, pose, frame.timestamp)
+                # After a coverage checkpoint is temporarily unreachable,
+                # keep frontier exploration biased toward that checkpoint.
+                # Purely global information-gain scoring repeatedly revisits
+                # the already mapped start bay and never returns to the route.
+                toward = (self.course.target if self.course is not None
+                          and self.course.coverage_tour else None)
+                self.goal = self.explorer.choose(self.grid, pose, frame.timestamp, toward=toward)
                 if self.goal is None:
                     if self.explored_empty_since is None:
                         self.explored_empty_since = frame.timestamp

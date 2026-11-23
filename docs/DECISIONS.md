@@ -1,5 +1,17 @@
 # Architecture and Research Decisions
 
+## 2026-11-18: user-selected public-map survey, avoid rubble
+
+Use an explicit offline public-scene map and preplanned survey viewpoints,
+sensor-estimated localization and online body/obstacle checks. Do not require
+per-cell measured floor support to traverse the known continuous floor.
+Retain measured mapping separately and label the prior visibly; no root-state
+navigation or claims of unknown-layout SLAM. Avoid rubble as a region until a
+locomotion strategy exists; unknown height does not establish traversability.
+Repair under-roof topology with declared ground and clearance instead of
+treating every top-down roof shadow as a solid wall. Preserve the pipe2 exit
+drop guard and the hardware calibration/command opt-in boundaries.
+
 ## 2026-11-15: add official MuJoCo + open-source MPC, preserve real backend
 
 Explicitly requested by the user after the real-robot V1. Use the same Autonomy and sensor Frame interfaces. Pin MIT-licensed go2-convex-mpc rather than introduce RL. Adapt it to the supplied model using MuJoCo-native mass/inertia/Jacobians, named joints and IMU/leg-kinematic odometry; no second URDF/Pinocchio model is required.

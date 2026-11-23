@@ -40,6 +40,8 @@ def task_scene(root: Path, output: Path, spawn: tuple[float, float], layout="fin
     elif layout == "near-start":
         # Retain the old short integration fixture only as an explicit option.
         marker_position = np.array([spawn[0] + 1.25, spawn[1], .43])
+    elif layout == "perception":
+        marker_position = np.array([spawn[0] + 1.55, spawn[1] + .20, .43])
     else:
         raise ValueError(f"Unknown task layout: {layout}")
     ball_position = marker_position + [.35, .25, -.32]
@@ -89,36 +91,37 @@ def task_scene(root: Path, output: Path, spawn: tuple[float, float], layout="fin
     ball.add_freejoint(name="local_football_free")
     ball.add_geom(name="local_football_geom", type=mujoco.mjtGeom.mjGEOM_SPHERE,
                   size=[.11, 0, 0], mass=.43, material="football_pattern", friction=[.8, .02, .001], condim=3)
-    marker = cv2.aruco.generateImageMarker(cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50), 42, 256)
-    marker = cv2.copyMakeBorder(marker, 32, 32, 32, 32, cv2.BORDER_CONSTANT, value=255)
-    # Raw pixels are embedded in the runtime model; no remote texture required.
-    rgb = cv2.cvtColor(marker, cv2.COLOR_GRAY2RGB)
-    spec.add_texture(name="local_finish_texture", type=mujoco.mjtTexture.mjTEXTURE_2D,
-                     width=320, height=320, nchannel=3, data=rgb.ravel().tolist())
-    spec.add_material(name="local_finish_material", textures=["", "local_finish_texture", "", "", "", "", "", "", "", ""],
-                      texuniform=True, texrepeat=[1, 1], emission=.5, reflectance=0.)
-    rotation = np.array([[0., 0., -1.], [-1., 0., 0.], [0., 1., 0.]])
-    # Explicit UVs avoid MuJoCo's size-dependent box texture repetition.
-    vertices = [[x, y, z] for z in [-.003, .003] for y in [-.125, .125] for x in [-.125, .125]]
-    faces = [[4, 5, 7], [4, 7, 6], [0, 2, 3], [0, 3, 1], [0, 1, 5], [0, 5, 4],
-             [2, 6, 7], [2, 7, 3], [0, 4, 6], [0, 6, 2], [1, 3, 7], [1, 7, 5]]
-    uv = [[0, 0], [1, 0], [0, 1], [1, 1]] * 2
-    spec.add_mesh(name="local_marker_mesh", uservert=np.asarray(vertices).ravel().tolist(),
-                  userface=np.asarray(faces).ravel().tolist(), usertexcoord=np.asarray(uv).ravel().tolist(),
-                  userfacetexcoord=np.asarray(faces).ravel().tolist())
-    spec.add_material(name="local_board_white", rgba=[1, 1, 1, 1], emission=.5)
-    spec.worldbody.add_geom(name="local_finish_marker", type=mujoco.mjtGeom.mjGEOM_MESH, meshname="local_marker_mesh",
-                            pos=marker_position, quat=quat(rotation),
-                            size=[.125, .125, .003], material="local_board_white", rgba=[1, 1, 1, 1], contype=0, conaffinity=0)
-    # Render the actual marker cells as tiny static geometries. This keeps its
-    # optical appearance independent of mesh UV conventions across MuJoCo builds.
-    pattern = cv2.aruco.generateImageMarker(cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50), 42, 6)
-    cell = .2 / 6
-    for row, col in np.argwhere(pattern == 0):
-        spec.worldbody.add_geom(name=f"local_finish_cell_{row}_{col}", type=mujoco.mjtGeom.mjGEOM_BOX,
-                                pos=marker_position + [-.004, -(col - 2.5) * cell, (2.5 - row) * cell],
-                                quat=quat(rotation), size=[cell / 2, cell / 2, .0008],
-                                rgba=[0, 0, 0, 1], contype=0, conaffinity=0)
+    if layout != "perception":
+        marker = cv2.aruco.generateImageMarker(cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50), 42, 256)
+        marker = cv2.copyMakeBorder(marker, 32, 32, 32, 32, cv2.BORDER_CONSTANT, value=255)
+        # Raw pixels are embedded in the runtime model; no remote texture required.
+        rgb = cv2.cvtColor(marker, cv2.COLOR_GRAY2RGB)
+        spec.add_texture(name="local_finish_texture", type=mujoco.mjtTexture.mjTEXTURE_2D,
+                         width=320, height=320, nchannel=3, data=rgb.ravel().tolist())
+        spec.add_material(name="local_finish_material", textures=["", "local_finish_texture", "", "", "", "", "", "", "", ""],
+                          texuniform=True, texrepeat=[1, 1], emission=.5, reflectance=0.)
+        rotation = np.array([[0., 0., -1.], [-1., 0., 0.], [0., 1., 0.]])
+        # Explicit UVs avoid MuJoCo's size-dependent box texture repetition.
+        vertices = [[x, y, z] for z in [-.003, .003] for y in [-.125, .125] for x in [-.125, .125]]
+        faces = [[4, 5, 7], [4, 7, 6], [0, 2, 3], [0, 3, 1], [0, 1, 5], [0, 5, 4],
+                 [2, 6, 7], [2, 7, 3], [0, 4, 6], [0, 6, 2], [1, 3, 7], [1, 7, 5]]
+        uv = [[0, 0], [1, 0], [0, 1], [1, 1]] * 2
+        spec.add_mesh(name="local_marker_mesh", uservert=np.asarray(vertices).ravel().tolist(),
+                      userface=np.asarray(faces).ravel().tolist(), usertexcoord=np.asarray(uv).ravel().tolist(),
+                      userfacetexcoord=np.asarray(faces).ravel().tolist())
+        spec.add_material(name="local_board_white", rgba=[1, 1, 1, 1], emission=.5)
+        spec.worldbody.add_geom(name="local_finish_marker", type=mujoco.mjtGeom.mjGEOM_MESH, meshname="local_marker_mesh",
+                                pos=marker_position, quat=quat(rotation),
+                                size=[.125, .125, .003], material="local_board_white", rgba=[1, 1, 1, 1], contype=0, conaffinity=0)
+        # Render the actual marker cells as tiny static geometries. This keeps its
+        # optical appearance independent of mesh UV conventions across MuJoCo builds.
+        pattern = cv2.aruco.generateImageMarker(cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50), 42, 6)
+        cell = .2 / 6
+        for row, col in np.argwhere(pattern == 0):
+            spec.worldbody.add_geom(name=f"local_finish_cell_{row}_{col}", type=mujoco.mjtGeom.mjGEOM_BOX,
+                                    pos=marker_position + [-.004, -(col - 2.5) * cell, (2.5 - row) * cell],
+                                    quat=quat(rotation), size=[cell / 2, cell / 2, .0008],
+                                    rgba=[0, 0, 0, 1], contype=0, conaffinity=0)
     model = spec.compile()
     data = mujoco.MjData(model)
     # Check imported collision placement after mesh re-centering by comparing
@@ -154,8 +157,8 @@ def task_scene(root: Path, output: Path, spawn: tuple[float, float], layout="fin
         "max_geometry_vertex_error_m": max_error,
         "task_layout": layout,
         "diagnostics_only_placements": {"football_world_xyz": ball_position.tolist(),
-                                         "finish_marker_world_xyz": marker_position.tolist()},
-        "additions": ["dynamic football", "local ArUco marker", "light"]}, indent=2) + "\n")
+                                         "finish_marker_world_xyz": marker_position.tolist() if layout != "perception" else None},
+        "additions": ["dynamic football", "light"] if layout == "perception" else ["dynamic football", "local ArUco marker", "light"]}, indent=2) + "\n")
     if save_model:
         mujoco.mj_saveModel(model, str(output / "runtime-scene.mjb"))
     return model

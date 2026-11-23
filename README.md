@@ -2,7 +2,7 @@
 
 面向 MuJoCo 仿真和实物 Go2 的模块化自主算法。仿真使用开源凸 MPC，实物调用厂家行走接口，不依赖 ROS 2、RL 或训练。
 
-当前验证环境为 **Python 3.10.22、MuJoCo 3.17.0**；Python 3.12 尚未验证。当前成果是固定顺序路线下的自主行走与局部避障原型，完整比赛闭环、自主全覆盖探索和实物部署尚未验收。
+当前验证环境为 **Python 3.12.12、MuJoCo 3.17.0、ONNX Runtime 1.31.1（对照）/ 1.32.0（主 venv）**；Python 3.12 下全量测试已通过（123 passed / 1 skipped）。当前成果是固定顺序路线下的自主行走与局部避障原型，完整比赛闭环、自主全覆盖探索和实物部署尚未验收。
 
 ![早期固定顺序路线规划示意，非完整实测轨迹](docs/images/ordered-route-plan.png)
 
@@ -59,7 +59,7 @@ sha256sum -c SHA256SUMS
 | 定位建图 | 降低稀疏雷达漂移，完善坡面高程、退化处理、传感器标定及时间同步 |
 | 规划与探索 | 原地图绕行；死胡同沿安全来路后退、到宽处转向；减少严格航点停走，完善区域探索和视觉补扫 |
 | 视觉感知 | 测试遮挡球、相似石块、多球和滚动球；统计召回、误报、重复报告及位置误差 |
-| 系统与测试 | 接通找球报位和终点流程，适配正式协议及实物驱动；性能分析、多场景回归与Python 3.12兼容验证 |
+| 系统与测试 | 接通找球报位和终点流程，适配正式协议及实物驱动；性能分析、多场景回归（Python 3.12 基础验证已完成，比赛提交接口未做） |
 
 当前死胡同阶段仍约38秒，其中约16.7秒处于朝向对齐状态；导航计算P95约151ms，超过10Hz的100ms预算。优化需要同时覆盖转弯流程、计算耗时和控制稳定性。
 
@@ -68,5 +68,6 @@ sha256sum -c SHA256SUMS
 ## 资源与详细说明
 
 - [架构与接口](docs/ARCHITECTURE.md) · [实物接入](docs/HARDWARE_ADAPTER.md) · [本地场景与相机](docs/LOCAL_MAP.md) · [速度设置](docs/SPEED.md)
+- 迁移与验证：[Gazebo→MuJoCo 迁移记录](docs/MIGRATION_GAZEBO.md) · [传感器参数与官方指南核验](docs/SENSOR_ASSUMPTIONS.md) · [低矮障碍感知与高度审计](docs/SUMMARY_2026-11-17.md) · [激光滤波/匹配器 A/B](docs/LASER_MUJOCO_AB.md)
 - [官方资源说明原文](source-metadata/training-package-original/README.md)及原始校验清单已备份；根目录 `SHA256SUMS` 的README条目指向该原文，其他资源校验条目保持不变。
 - 开源MPC源码及许可证保留在 `third_party/go2_convex_mpc/`；资源许可见 `NOTICE.md`、`LICENSES/` 和 [第三方说明](THIRD_PARTY_V1.md)。
