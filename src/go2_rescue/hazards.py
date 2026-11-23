@@ -21,6 +21,30 @@ class WaterDetector:
         self.camera_from_body = np.linalg.inv(config.body_from_camera)
         self.body_from_camera = np.asarray(config.body_from_camera, float)
 
+    def colour_support_candidate(self,labels,region,frame,pose,grid):
+        """Conservative keep-out cue; not a confirmed water/material label."""
+        plane=getattr(grid,"support_plane",None)
+        if not self.c.navigation_support or plane is None:
+            return None
+        pixels=np.argwhere(labels==region)[::5]
+        if len(pixels)<3:return None
+        rays=np.column_stack([(pixels[:,1]-self.k[0,2])/self.k[0,0],
+                              (pixels[:,0]-self.k[1,2])/self.k[1,1],np.ones(len(pixels))])
+        level=gravity_rotation(frame.quaternion)
+        origin=level@self.body_from_camera[:3,3]
+        direction=rays@self.body_from_camera[:3,:3].T@level.T
+        denominator=direction[:,2]-direction[:,:2]@plane[:2]
+        scale=np.divide(plane[2]+origin[:2]@plane[:2]-origin[2],denominator,
+            out=np.full(len(rays),np.inf),where=denominator<-.05)
+        valid=(scale>.2)&(scale<2.5)
+        if valid.sum()<3:return None
+        points=origin+scale[valid,None]*direction[valid]
+        xy=transform_xy(points,pose)
+        # Position/plane uncertainty adds clearance, never clears free space.
+        expanded=np.vstack([xy+offset for offset in [[.10,0],[-.10,0],[0,.10],[0,-.10]]])
+        polygon=cv2.convexHull(expanded.astype(np.float32))[:,0]
+        return polygon if .004<cv2.contourArea(polygon)<1.5 else None
+
     def detect(self, image, frame, pose, grid):
         if not self.c.water_detection:
             return []
@@ -38,11 +62,15 @@ class WaterDetector:
         world_xy = transform_xy(points, pose)
         ray_origin = level @ self.body_from_camera[:3, 3]
         polygons = []
+        self.last_sources=[]
         for region in range(1, count):
             if stats[region, cv2.CC_STAT_AREA] < 15:
                 continue
             hits = ids[labels[pixel[ids, 1], pixel[ids, 0]] == region]
             if len(hits) < 2:
+                candidate=self.colour_support_candidate(labels,region,frame,pose,grid)
+                if candidate is not None:
+                    polygons.append(candidate);self.last_sources.append("rgb_stance_keepout_candidate")
                 continue
             # Reject coloured walls/signs: hits must agree with measured floor.
             floor = np.array([grid.floor[grid.cell(p)] if grid.inside(grid.cell(p)) else np.nan for p in world_xy[hits]])
@@ -88,4 +116,5 @@ class WaterDetector:
             area = cv2.contourArea(polygon)
             if .004 < area < 1.5:
                 polygons.append(polygon)
+                self.last_sources.append("lidar_ground_colour")
         return polygons

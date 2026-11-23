@@ -14,6 +14,9 @@ class Config:
     calibrated: bool = False
     localization_backend: str = "icp"
     localization_metric: str = "point_to_point"
+    kinematic_velocity_frame: str = "body"  # gravity_body for the fused simulator planar motion.
+    metric_visual_odometry: bool = False  # Experimental; texture-dependent, not default.
+    navigation_support: bool = False  # RGB + measured stance, opt-in simulator integration.
     imu_heading_reference: bool = False  # Enable only with a stable orientation sensor.
     map_size: float = 40.0
     resolution: float = 0.10
@@ -30,6 +33,17 @@ class Config:
     max_slope_deg: float = 10.0
     terrain_slope_regions: list = field(default_factory=list)  # Explicit map_start terrain capabilities, no map clearing.
     ground_max_gap: float = 0.45
+    map_connected_ramp_ground: bool = False  # experimental: RGB + connected measured ramp
+    # Mapping evidence / near-ground ray criterion (default off: existing map behaviour unchanged).
+    map_evidence: bool = False  # record per-cell, per-frame evidence counters in GridMap
+    map_evidence_positions: bool = False  # also store independent 0.25 m view bins per cell (offline)
+    map_ray_height_clear: bool = False  # record per-cell band-crossing evidence (diagnostic; no gate)
+    map_skip_high_clear: bool = False  # skip prefix free votes where the ray is entirely above body clearance
+    map_skip_above_near_clear: bool = False  # skip free votes only crossing the collision band, never the near band
+    map_wall_truncate: bool = False  # experimental: stop ray prefix free updates at a stable wall; rejected by full-run A/B (P90 regression)
+    map_wall_logodds: float = 2.0  # occupied confidence needed as a stable wall (two hits)
+    map_near_band_low: float = 0.02  # clearance band above the local floor (metres)
+    map_near_band_high: float = 0.12
     water_detection: bool = False
     water_hsv_lower: list = field(default_factory=lambda: [80, 65, 35])
     water_hsv_upper: list = field(default_factory=lambda: [125, 255, 255])
@@ -44,19 +58,39 @@ class Config:
     command_timeout: float = 0.30
     max_sensor_age: float = 0.30
     max_frame_gap: float = 0.50
-    max_range: float = 8.0
+    max_range: float = 12.0
+    min_range: float = 0.05
+    lidar_height_floor: float = -0.22  # gravity-aligned vertical floor from the base origin
+    lidar_mount: list = field(default_factory=lambda: [0., 0., .10])  # body-frame LiDAR origin
+    lidar_noise_std: float = 0.002
+    lidar_dropout: float = 0.0
+    lidar_contract_order: bool = False  # clip/dropout/noise before height+nearest reduction (public contract)
+    lidar_vertical_fov_deg: float = 96.0
+    # Centre of the 96 deg sweep. Kept at the repo's original -22.5 deg so the
+    # downward rays that feed terrain/ramp estimation are preserved; the exact
+    # elevation table is still owned by sensors.json (not published yet).
+    lidar_elevation_center_deg: float = -22.5
+    lidar_speckle_window: int = 0  # 0 disables; azimuth neighbours inspected per return
+    lidar_speckle_delta: float = 0.10  # metres; neighbour disagreement that marks a speckle
+    lidar_shadow_deg: float = 0.0  # 0 disables; max incidence angle before a ray is dropped
+    lidar_shadow_neighbours: int = 1
     min_points: int = 30
     min_pose_quality: float = 0.45
     mission_seconds: float = 180.0
     return_reserve: float = 35.0
     target_quota: int = 0  # Zero means unknown; positive only for declared test tasks.
     course_route: str = ""  # Explicit fixed-map prior, never simulator state.
+    navigation_prior: str = ""  # Explicit offline public-map navigation/localization prior.
+    navigation_surface_reference: str = ""
+    experimental_scan_window: bool = False
     course_portal_resolution: float = 0.  # Optional finer local-course map after ramp/S/dead end.
     allow_margin_escape: bool = False  # Known simulated envelope only by default.
     ball_radius: float = 0.11
     ball_confirmations: int = 3
     min_ball_confidence: float = 0.62
-    camera_matrix: list = field(default_factory=lambda: [[260., 0., 160.], [0., 260., 120.], [0., 0., 1.]])
+    # Guide v1.0.02: 320x240, 10 Hz, vertical FOV 60 deg, no depth.
+    # fx=fy=(H/2)/tan(30 deg)=207.846 for the 60 deg render frustum.
+    camera_matrix: list = field(default_factory=lambda: [[207.846, 0., 160.], [0., 207.846, 120.], [0., 0., 1.]])
     distortion: list = field(default_factory=lambda: [0., 0., 0., 0., 0.])
     # OpenCV optical frame: right/down/forward -> body: forward/left/up.
     body_from_camera: list = field(default_factory=lambda: [[0., 0., 1., .24], [-1., 0., 0., 0.], [0., -1., 0., .08], [0., 0., 0., 1.]])
@@ -84,6 +118,15 @@ class Config:
             raise ValueError("Invalid positive geometry/timing/speed limits")
         if not 0 < self.return_reserve < self.mission_seconds:
             raise ValueError("Return reserve must be inside mission budget")
+        if (self.lidar_speckle_window < 0 or self.lidar_speckle_delta < 0
+                or self.lidar_shadow_deg < 0 or self.lidar_shadow_neighbours < 0):
+            raise ValueError("Lidar filter parameters must be nonnegative")
+        if not (0 < self.min_range < self.max_range) or not 0 < self.lidar_vertical_fov_deg < 180:
+            raise ValueError("Invalid lidar range/FOV (guide baseline: 0.05-12 m, 96 deg)")
+        if not -90 <= self.lidar_elevation_center_deg <= 90:
+            raise ValueError("lidar_elevation_center_deg must be within [-90, 90]")
+        if not (0 <= self.map_near_band_low < self.map_near_band_high <= self.body_clearance):
+            raise ValueError("map near-ground band must satisfy 0 <= low < high <= body_clearance")
         if not isinstance(self.target_quota, int) or self.target_quota < 0:
             raise ValueError("target_quota must be a nonnegative declared count")
         if not isinstance(self.course_route, str):
@@ -113,6 +156,8 @@ class Config:
         low, high = np.asarray(self.water_hsv_lower), np.asarray(self.water_hsv_upper)
         if low.shape != (3,) or high.shape != (3,) or not np.isfinite(low).all() or not np.isfinite(high).all() or (low < 0).any() or (high > [179, 255, 255]).any() or (low > high).any():
             raise ValueError("Invalid water HSV cue")
+        if self.kinematic_velocity_frame not in {"body","gravity_body"}:
+            raise ValueError("Unknown measured velocity frame")
         if self.localization_backend not in {"icp", "kiss"}:
             raise ValueError("localization_backend must be icp or kiss")
         if self.localization_metric not in {"point_to_point", "point_to_line"}:

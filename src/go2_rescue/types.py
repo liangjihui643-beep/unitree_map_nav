@@ -33,8 +33,14 @@ class Frame:
     point_times: np.ndarray | None = None
     state_age: float = 0.0
     image_age: float = 0.0
+    support_points: np.ndarray | None = None  # body FLU contact soles from joint/IMU kinematics
 
     def validate(self) -> None:
+        if self.support_points is not None:
+            self.support_points = np.asarray(self.support_points, dtype=float)
+            if (self.support_points.ndim != 2 or self.support_points.shape[1] != 3
+                    or len(self.support_points) > 4 or not np.isfinite(self.support_points).all()):
+                raise ValueError("support_points must contain up to four finite body-frame soles")
         if not math.isfinite(self.timestamp):
             raise ValueError("Non-finite sensor timestamp")
         self.points = np.asarray(self.points, dtype=float)
@@ -79,6 +85,7 @@ class BallObservation:
     arc_support: float
     position: np.ndarray | None = None
     sigma: float = 1.0
+    range_source: str = "unknown"
 
 
 @dataclass

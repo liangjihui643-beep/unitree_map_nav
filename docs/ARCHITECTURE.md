@@ -1,5 +1,34 @@
 # Architecture
 
+## Public-map planned survey (2026-11-18)
+
+The user selected a known-scene survey instead of frontier exploration and
+requires avoiding rock piles without a validated rubble locomotion policy.
+`--planned-survey` uses a separately declared, offline generated public-map
+prior for A*/oriented-body DWA and scan-to-map localization. Online code still
+uses only sensor Frame observations for the current pose. This is known-map
+localization, not unknown-layout SLAM, and never uses simulator root state.
+
+`Autonomy.grid` remains an independent measured occupancy/elevation/semantic
+map. Its missing ground samples do not erase navigable prior floor. The
+separate `PriorNavigationGrid` forbids rock footprints and walls, verifies
+known roof-underpass ground/headroom offline, and incorporates online hazards
+and independently repeated visual risk candidates. It is never exported as
+the measured map. Each run freezes the prior asset and its SHA256.
+
+The route contains survey viewpoints, with explicit heading gates at narrow
+passages. Existing full-body margin escape and SE(2) maneuvers recover a safe
+alignment when a pure turn is blocked; all motion edges retain body and
+hazard-envelope checks. Measured slope limits remain active across route
+stage transitions. The original observed-floor/frontier mode and native
+backend remain available. Known-route truth control is a distinct diagnostic
+flag that is excluded from autonomous acceptance.
+
+The default `run_full_coverage.py` entry now selects planned survey;
+`--legacy-exploration` selects the previous strategy. Actual performance is
+documented in `预规划巡查实施与验证-2026-11-18.md`; offline connectivity is not
+physical completion or competition acceptance.
+
 ## Data flow
 
 ```text

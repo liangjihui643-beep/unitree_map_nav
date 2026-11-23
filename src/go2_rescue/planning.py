@@ -200,7 +200,7 @@ class Explorer:
         i = valid[int(np.argmin(costs))]
         return np.column_stack([positions[i], headings[i]])
 
-    def choose(self, grid: GridMap, pose: Pose, timestamp: float) -> np.ndarray | None:
+    def choose(self, grid: GridMap, pose: Pose, timestamp: float, toward=None) -> np.ndarray | None:
         free = grid.traversable()
         start = grid.cell(pose.xy())
         if not grid.inside(start) or not free[start]:
@@ -259,7 +259,17 @@ class Explorer:
                     continue
                 index = eligible_indices[valid_approaches[0]]
                 distance = max(.2, index * grid.c.resolution)
-                candidates.append((min(len(cells), 60)*.04 - distance, positions[index]))
+                score=min(len(cells), 60)*.04-distance
+                if toward is not None:
+                    # When recovering an ordered survey, prefer safe views
+                    # that also make progress toward its checkpoint. A modest
+                    # retreat is allowed to look around a blocked bend.
+                    advance=np.linalg.norm(np.asarray(toward)-pose.xy())-np.linalg.norm(
+                        np.asarray(toward)-positions[index])
+                    if advance < -.35:
+                        continue
+                    score += 1.5*advance
+                candidates.append((score, positions[index]))
                 break
         return max(candidates, key=lambda v: v[0])[1] if candidates else None
 

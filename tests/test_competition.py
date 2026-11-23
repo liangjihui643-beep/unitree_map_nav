@@ -2,6 +2,7 @@ import os
 os.environ.setdefault("MUJOCO_GL", "egl")
 
 from pathlib import Path
+import cv2
 import numpy as np
 import pytest
 from scipy.spatial.transform import Rotation
@@ -86,7 +87,7 @@ def test_dynamic_window_never_exceeds_limits_when_measured_speed_overshoots():
     assert abs(command.wz) <= c.max_wz
 
 
-def test_rendered_puddle_is_confirmed_by_lidar_and_blocks_planning():
+def test_rendered_puddle_rgb_keepout_candidate_blocks_planning():
     mujoco = pytest.importorskip("mujoco")
     from go2_rescue.mujoco_sim import SimSensors, simulation_config
     root = Path(__file__).resolve().parents[1]
@@ -98,6 +99,8 @@ def test_rendered_puddle_is_confirmed_by_lidar_and_blocks_planning():
     data.qpos[3:7] = np.roll(Rotation.from_euler("xyz", [0., -.21, np.pi/2]).as_quat(), 1)
     mujoco.mj_forward(model, data)
     c = simulation_config()
+    c.water_detection = True
+    c.navigation_support = True
     sensors = SimSensors(model, data, c)
     try:
         frame = sensors.observe(Velocity())
@@ -105,8 +108,13 @@ def test_rendered_puddle_is_confirmed_by_lidar_and_blocks_planning():
         sensors.close()
     grid = GridMap(c)
     grid.update(frame.points @ gravity_rotation(frame.quaternion).T, Pose())
-    polygons = WaterDetector(c).detect(frame.image, frame, Pose(), grid)
+    # This fixture is level at the map origin; make the RGB/stance branch's
+    # prerequisite explicit instead of asking GridMap to invent a plane.
+    grid.support_plane = np.zeros(3)
+    detector = WaterDetector(c)
+    polygons = detector.detect(frame.image, frame, Pose(), grid)
     assert polygons
+    assert detector.last_sources == ["rgb_stance_keepout_candidate"]
     for polygon in polygons:
         grid.add_hazard(polygon)
         grid.add_hazard(polygon)
@@ -114,6 +122,41 @@ def test_rendered_puddle_is_confirmed_by_lidar_and_blocks_planning():
     assert not grid.traversable()[grid.cell(polygons[0].mean(axis=0))]
     c.water_detection = False
     assert not WaterDetector(c).detect(frame.image, frame, Pose(), grid)
+
+
+def test_laser_ground_colour_confirms_puddle_without_rgb_keepout():
+    from go2_rescue.hazards import WaterDetector
+    from go2_rescue.mujoco_sim import simulation_config
+    from go2_rescue.types import Frame
+
+    c = simulation_config()
+    c.water_detection = True
+    c.navigation_support = False
+    k = np.asarray(c.camera_matrix, float)
+    body_from_camera = np.asarray(c.body_from_camera, float)
+    # Build body-frame ground returns that project into a small cyan image
+    # patch. This exercises the lidar-confirmed branch, not the RGB keepout
+    # candidate that requires a stance plane.
+    us, vs = np.arange(150., 171., 2.), np.arange(170., 191., 2.)
+    uv = np.array(np.meshgrid(us, vs)).reshape(2, -1).T
+    x = (uv[:, 0] - k[0, 2]) / k[0, 0]
+    y = (uv[:, 1] - k[1, 2]) / k[1, 1]
+    target = -c.base_height
+    denominator = body_from_camera[2, 0] * x + body_from_camera[2, 1] * y + body_from_camera[2, 2]
+    depth = (target - body_from_camera[2, 3]) / denominator
+    camera_points = np.column_stack([x * depth, y * depth, depth])
+    body = camera_points @ body_from_camera[:3, :3].T + body_from_camera[:3, 3]
+    image = np.zeros((240, 320, 3), np.uint8)
+    cv2.rectangle(image, (int(us.min()), int(vs.min())),
+                  (int(us.max()), int(vs.max())), (255, 255, 0), -1)
+    grid = GridMap(c)
+    grid.update(body, Pose())
+    frame = Frame(0., body, image=image)
+    detector = WaterDetector(c)
+    polygons = detector.detect(image, frame, Pose(), grid)
+    assert len(polygons) == 1
+    assert detector.last_sources == ["lidar_ground_colour"]
+    assert .004 < cv2.contourArea(polygons[0]) < 1.5
 
 
 def test_evaluator_water_episodes_are_diagnostic_and_debounced():
@@ -137,7 +180,7 @@ def test_evaluator_water_episodes_are_diagnostic_and_debounced():
     assert not evaluator.report(data, False, False)["local_task_pass"]
 
 
-def test_sparse_observed_corner_has_collision_checked_se2_escape():
+def test_sparse_observed_corner_refuses_unsafe_escape():
     mujoco = pytest.importorskip("mujoco")
     from go2_rescue.mujoco_sim import SimSensors, simulation_config
     from go2_rescue.planning import Explorer
@@ -157,16 +200,37 @@ def test_sparse_observed_corner_has_collision_checked_se2_escape():
     grid = GridMap(c)
     grid.update(points, Pose())
     route = Explorer().maneuver(grid, Pose())
+    assert route.shape == (0, 3)
+    half = np.array([c.footprint_half_length, c.footprint_half_width]) + c.safety_margin
+    x, y = np.meshgrid(np.linspace(-half[0], half[0], 9), np.linspace(-half[1], half[1], 7))
+    offsets = np.column_stack([x.ravel(), y.ravel()])
+    assert not grid.footprints_safe(np.zeros((1, 2)), np.zeros(1), offsets)[0]
+
+
+def test_observed_map_allows_collision_checked_se2_escape():
+    from go2_rescue.mujoco_sim import simulation_config
+    from go2_rescue.planning import Explorer
+
+    c = simulation_config()
+    grid = GridMap(c)
+    x, y = np.meshgrid(np.arange(-2., 3.01, .08), np.arange(-2., 2.01, .08))
+    ground = np.column_stack([x.ravel(), y.ravel(), np.full(x.size, -c.base_height)])
+    grid.update(ground, Pose())
+    wall_y = np.arange(-1., 1.01, .06)
+    wall = np.column_stack([np.full(len(wall_y), 1.), wall_y,
+                            np.full(len(wall_y), -.05)])
+    grid.update(np.vstack([ground, wall]), Pose())
+    route = Explorer().maneuver(grid, Pose())
     assert len(route) > 2 and np.linalg.norm(route[-1, :2]) > .45
     assert abs(route[-1, 2]) > .35
-    half = np.array([c.footprint_half_length, c.footprint_half_width])+c.safety_margin
+    half = np.array([c.footprint_half_length, c.footprint_half_width]) + c.safety_margin
     x, y = np.meshgrid(np.linspace(-half[0], half[0], 9), np.linspace(-half[1], half[1], 7))
     offsets = np.column_stack([x.ravel(), y.ravel()])
     for a, b in zip(route[:-1], route[1:]):
         fraction = np.linspace(0., 1., 9)
-        positions = a[:2]+(b[:2]-a[:2])*fraction[:, None]
-        angle = (b[2]-a[2]+np.pi)%(2*np.pi)-np.pi
-        assert grid.footprints_safe(positions, a[2]+angle*fraction, offsets).all()
+        positions = a[:2] + (b[:2] - a[:2]) * fraction[:, None]
+        angle = (b[2] - a[2] + np.pi) % (2 * np.pi) - np.pi
+        assert grid.footprints_safe(positions, a[2] + angle * fraction, offsets).all()
 
 
 @pytest.mark.parametrize("roof,allowed", [(.45, False), (.65, True)])
